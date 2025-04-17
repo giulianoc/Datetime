@@ -31,6 +31,11 @@ using namespace std;
 class Datetime
 {
   public:
+	static string timePointAsLocalString(chrono::system_clock::time_point t);
+	static string timePointAsUtcString(chrono::system_clock::time_point t);
+	static string localToUtcString(tm localTime);
+	static tm utcSecondsToLocalTime(time_t utcTime);
+
 	/**
 		The plTimeZoneDifferenceInHours parameter could be also NULL,
 		in that case the variable is not initialized.
@@ -48,7 +53,7 @@ class Datetime
 	// ulTextFormat:
 	// 	1: "YYYY-MM-DD HH:MI:SS"
 	// 	2: "YYYY_MM_DD"
-	static void nowLocalTime(char *pDateTime, unsigned long ulBufferSize, unsigned long ulTextFormat);
+	static string nowLocalTime(unsigned long ulTextFormat);
 
 	static void getTimeZoneInformation(long *plTimeZoneDifferenceInHours);
 
@@ -125,7 +130,9 @@ class Datetime
 
 	static void getLastDayOfMonth(unsigned long ulYear, unsigned long ulMonth, unsigned long *pulLastDayOfMonth);
 
+	static long sTimeToMilliSecs(string sTime);
 	static time_t sDateSecondsToUtc(string sDate);
+	static time_t sDateSecondsToUtcInMs(string sDate);
 	static int64_t sDateMilliSecondsToUtc(string sDate);
 	static string utcToUtcString(time_t utc);
 	static string utcToLocalString(time_t utc);

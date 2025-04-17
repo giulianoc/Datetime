@@ -29,17 +29,55 @@
 #else
 #include <sys/time.h>
 #endif
-#include <exception>
 #include <format>
 /*
-#ifdef _REENTRANT
-	#include <pthread.h>	// for localtime_r
-#endif
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
-#include <assert.h>
-#include <errno.h>
 */
+
+// 2021-02-26 15:41:15
+string Datetime::timePointAsLocalString(chrono::system_clock::time_point t)
+{
+	tm tmDateTime;
+	// char strDateTime[64];
+	time_t utcTime = chrono::system_clock::to_time_t(t);
+	localtime_r(&utcTime, &tmDateTime);
+
+	return std::format(
+		"{:0>4}-{:0>2}-{:0>2} {:0>2}:{:0>2}:{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
+		tmDateTime.tm_min, tmDateTime.tm_sec
+	);
+}
+
+// 2021-02-26T15:41:15Z
+string Datetime::timePointAsUtcString(chrono::system_clock::time_point t)
+{
+	tm tmDateTime;
+	// char strDateTime[64];
+	time_t utcTime = chrono::system_clock::to_time_t(t);
+	gmtime_r(&utcTime, &tmDateTime);
+
+	return std::format(
+		"{:0>4}-{:0>2}-{:0>2}T{:0>2}:{:0>2}:{:0>2}Z", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
+		tmDateTime.tm_min, tmDateTime.tm_sec
+	);
+}
+
+string Datetime::localToUtcString(tm localTime)
+{
+	time_t utcTime = timegm(&localTime);
+
+	return utcToUtcString(utcTime);
+}
+
+tm Datetime::utcSecondsToLocalTime(time_t utcTime)
+{
+	tm tmDateTime;
+
+	localtime_r(&utcTime, &tmDateTime);
+	return tmDateTime;
+}
 
 void Datetime::nowUTCInMilliSecs(unsigned long long *pullNowUTCInSecs, unsigned long *pulAdditionalMilliSecs, long *plTimeZoneDifferenceInHours)
 {
@@ -105,39 +143,33 @@ void Datetime::nowLocalInMilliSecs(unsigned long long *pullNowLocalInMilliSecs)
 	*pullNowLocalInMilliSecs = ullNowUTCInMilliSecs + (lTimeZoneDifferenceInHours * 3600 * 1000);
 }
 
-void Datetime::nowLocalTime(char *pDateTime, unsigned long ulBufferSize, unsigned long ulTextFormat)
+string Datetime::nowLocalTime(unsigned long ulTextFormat)
 {
 	tm tmDateTime;
 	unsigned long ulMilliSecs;
 
-	if ((ulTextFormat == 1 && ulBufferSize <= 20) || (ulTextFormat == 2 && ulBufferSize <= 11) || (ulTextFormat != 1 && ulTextFormat != 2))
+	if (ulTextFormat != 1 && ulTextFormat != 2)
 	{
 		string errorMessage = std::format(
 			"Wrong input"
-			", ulTextFormat: {}"
-			", ulBufferSize: {}",
-			ulTextFormat, ulBufferSize
+			", ulTextFormat: {}",
+			ulTextFormat
 		);
 		throw runtime_error(errorMessage);
 	}
 
 	Datetime::get_tm_LocalTime(&tmDateTime, &ulMilliSecs);
 
+	string sDateTime;
 	if (ulTextFormat == 1)
-	{
-		sprintf(
-			pDateTime, "%04lu-%02lu-%02lu %02lu:%02lu:%02lu", (unsigned long)(tmDateTime.tm_year + 1900), (unsigned long)(tmDateTime.tm_mon + 1),
-			(unsigned long)(tmDateTime.tm_mday), (unsigned long)(tmDateTime.tm_hour), (unsigned long)(tmDateTime.tm_min),
-			(unsigned long)(tmDateTime.tm_sec)
+		sDateTime = std::format(
+			"{:0>4}-{:0>2}-{:0>2} {:0>2}:{:0>2}:{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
+			tmDateTime.tm_min, tmDateTime.tm_sec
 		);
-	}
 	else if (ulTextFormat == 2)
-	{
-		sprintf(
-			pDateTime, "%04lu_%02lu_%02lu", (unsigned long)(tmDateTime.tm_year + 1900), (unsigned long)(tmDateTime.tm_mon + 1),
-			(unsigned long)(tmDateTime.tm_mday)
-		);
-	}
+		sDateTime = std::format("{:0>4}_{:0>2}_{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday);
+
+	return sDateTime;
 }
 
 void Datetime::getTimeZoneInformation(long *plTimeZoneDifferenceInHours)
@@ -413,33 +445,54 @@ time_t Datetime::sDateSecondsToUtc(string sDate)
 }
 
 // 2021-02-26T15:41:15Z
+time_t Datetime::sDateSecondsToUtcInMs(string sDate) { return Datetime::sDateSecondsToUtc(sDate) * 1000; }
+
+// HH:MM
+long Datetime::sTimeToMilliSecs(string sTime)
+{
+	int hours;
+	int minutes;
+	int sscanfReturn;
+
+	if ((sscanfReturn = sscanf(sTime.c_str(), "%2d:%2d", &hours, &minutes)) != 2)
+	{
+		string errorMessage = std::format(
+			"Field has a wrong format (sscanf failed)"
+			", sTime: {}"
+			", sscanfReturn: {}",
+			sTime, sscanfReturn
+		);
+
+		return -1;
+	}
+
+	return (hours * 3600 + minutes * 60) * 1000;
+}
+
+// 2021-02-26T15:41:15Z
 string Datetime::utcToUtcString(time_t utc)
 {
 	tm tmDateTime;
-	char strDateTime[64];
 
 	gmtime_r(&utc, &tmDateTime);
-	sprintf(
-		strDateTime, "%04d-%02d-%02dT%02d:%02d:%02dZ", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
+
+	return std::format(
+		"{:0>4}-{:0>2}-{:0>2}T{:0>2}:{:0>2}:{:0>2}Z", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
 		tmDateTime.tm_min, tmDateTime.tm_sec
 	);
-
-	return string(strDateTime);
 }
 
 // 2021-02-26T15:41:15
 string Datetime::utcToLocalString(time_t utc)
 {
 	tm tmDateTime;
-	char strDateTime[64];
 
 	localtime_r(&utc, &tmDateTime);
-	sprintf(
-		strDateTime, "%04d-%02d-%02dT%02d:%02d:%02d", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
+
+	return std::format(
+		"{:0>4}-{:0>2}-{:0>2}T{:0>2}:{:0>2}:{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
 		tmDateTime.tm_min, tmDateTime.tm_sec
 	);
-
-	return string(strDateTime);
 }
 
 // 2021-02-26T15:41:15.477+0100 (ISO8610)
@@ -522,19 +575,21 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 		}
 	}
 
-	int64_t utcTime;
+	{
+		time_t utcTime;
 
-	time(&utcTime);
-	gmtime_r(&utcTime, &tmDate);
+		time(&utcTime);
+		gmtime_r(&utcTime, &tmDate);
 
-	tmDate.tm_year = ulUTCYear - 1900;
-	tmDate.tm_mon = ulUTCMonth - 1;
-	tmDate.tm_mday = ulUTCDay;
-	tmDate.tm_hour = ulUTCHour;
-	tmDate.tm_min = ulUTCMinutes;
-	tmDate.tm_sec = ulUTCSeconds;
+		tmDate.tm_year = ulUTCYear - 1900;
+		tmDate.tm_mon = ulUTCMonth - 1;
+		tmDate.tm_mday = ulUTCDay;
+		tmDate.tm_hour = ulUTCHour;
+		tmDate.tm_min = ulUTCMinutes;
+		tmDate.tm_sec = ulUTCSeconds;
+	}
 
-	utcTime = timegm(&tmDate) * 1000;
+	int64_t utcTime = timegm(&tmDate) * 1000;
 	utcTime += ulUTCMilliSeconds;
 
 	if (signTimeZone == '+')
