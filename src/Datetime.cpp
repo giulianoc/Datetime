@@ -385,8 +385,12 @@ time_t Datetime::sDateSecondsToUtc(string sDate)
 			 sscanf(sDate.c_str(), "%4lu-%2lu-%2luT%2lu:%2lu:%2luZ", &ulUTCYear, &ulUTCMonth, &ulUTCDay, &ulUTCHour, &ulUTCMinutes, &ulUTCSeconds)) !=
 		6)
 	{
-		string errorMessage = string("Field has a wrong format (sscanf failed)") + ", sDate: " + sDate + ", sscanfReturn: " + to_string(sscanfReturn);
-		// _logger->error(errorMessage);
+		string errorMessage = std::format(
+			"Field has a wrong format (sscanf failed)"
+			", sDate: {}"
+			", sscanfReturn: {}",
+			sDate, sscanfReturn
+		);
 
 		throw runtime_error(errorMessage);
 	}
@@ -463,20 +467,23 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 
 		signTimeZone = sDate[23];
 
-		dateFormat = string("%4lu-%2lu-%2luT%2lu:%2lu:%2lu.%3lu") + signTimeZone + "%2lu%2lu";
+		dateFormat = std::format("%4lu-%2lu-%2luT%2lu:%2lu:%2lu.%3lu{}%2lu%2lu", signTimeZone);
 	}
 	else if (sDate.size() == 24)
 	{
 		// 2021-02-26T15:41:15.477Z
-		dateFormat = string("%4lu-%2lu-%2luT%2lu:%2lu:%2lu.%3luZ");
+		dateFormat = "%4lu-%2lu-%2luT%2lu:%2lu:%2lu.%3luZ";
 
 		ulHourTimeZone = 0;
 		ulMinuteTimeZone = 0;
 	}
 	else
 	{
-		string errorMessage = string("Wrong date format") + ", sDate: " + sDate;
-		// _logger->error(errorMessage);
+		string errorMessage = std::format(
+			"Wrong date format"
+			", sDate: {}",
+			sDate
+		);
 
 		throw runtime_error(errorMessage);
 	}
@@ -488,9 +495,12 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 				 &ulHourTimeZone, &ulMinuteTimeZone
 			 )) != 9)
 		{
-			string errorMessage =
-				string("Field has a wrong format (sscanf failed)") + ", sDate: " + sDate + ", sscanfReturn: " + to_string(sscanfReturn);
-			// _logger->error(errorMessage);
+			string errorMessage = std::format(
+				"Field has a wrong format (sscanf failed)"
+				", sDate: {}"
+				", sscanfReturn: {}",
+				sDate, sscanfReturn
+			);
 
 			throw runtime_error(errorMessage);
 		}
@@ -501,9 +511,12 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 				 sDate.c_str(), dateFormat.c_str(), &ulUTCYear, &ulUTCMonth, &ulUTCDay, &ulUTCHour, &ulUTCMinutes, &ulUTCSeconds, &ulUTCMilliSeconds
 			 )) != 7)
 		{
-			string errorMessage =
-				string("Field has a wrong format (sscanf failed)") + ", sDate: " + sDate + ", sscanfReturn: " + to_string(sscanfReturn);
-			// _logger->error(errorMessage);
+			string errorMessage = std::format(
+				"Field has a wrong format (sscanf failed)"
+				", sDate: {}"
+				", sscanfReturn: {}",
+				sDate, sscanfReturn
+			);
 
 			throw runtime_error(errorMessage);
 		}

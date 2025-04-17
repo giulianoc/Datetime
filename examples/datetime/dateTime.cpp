@@ -58,7 +58,7 @@ int main()
 
 	std::cout << "  NowUTCInMilliSecs: " << ullNowUTCInMilliSecs << ", TimeZoneDifferenceInHours: " << lTimeZoneDifferenceInHours << std::endl;
 
-	DateTime::get_tm_LocalTime(&tmDateTime, &ulMilliSecs);
+	Datetime::get_tm_LocalTime(&tmDateTime, &ulMilliSecs);
 
 	Datetime::convertFromLocalDateTimeToLocalInSecs(
 		tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour - lTimeZoneDifferenceInHours, tmDateTime.tm_min,
