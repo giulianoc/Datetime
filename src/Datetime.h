@@ -82,6 +82,7 @@ class Datetime
 			tmDateTime. tm_isdst	 -1;
 	*/
 	static void convertFromLocalToUTC(tm *ptmDateTime, time_t *ptUTCTime);
+	static time_t localToUTC(tm *ptmDateTime);
 
 	static void convertFromLocalToUTC(tm *ptmLocalDateTime, tm *ptmUTCDateTime);
 
@@ -137,6 +138,7 @@ class Datetime
 	static int64_t sDateMilliSecondsToUtc(string sDate);
 	static string utcToUtcString(time_t utc);
 	static string utcToLocalString(time_t utc);
+	static time_t utcToLocal(time_t utc);
 };
 
 #endif

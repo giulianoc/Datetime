@@ -247,7 +247,9 @@ void Datetime::get_tm_LocalTime(tm *ptmDateTime, unsigned long *pulMilliSecs)
 #endif
 }
 
-void Datetime::convertFromLocalToUTC(tm *ptmDateTime, time_t *ptUTCTime) { *ptUTCTime = mktime(ptmDateTime); }
+void Datetime::convertFromLocalToUTC(tm *ptmDateTime, time_t *ptUTCTime) { *ptUTCTime = localToUTC(ptmDateTime); }
+
+time_t Datetime::localToUTC(tm *ptmDateTime) { return mktime(ptmDateTime); }
 
 void Datetime::convertFromLocalToUTC(tm *ptmLocalDateTime, tm *ptmUTCDateTime)
 {
@@ -496,14 +498,19 @@ string Datetime::utcToUtcString(time_t utc)
 // 2021-02-26T15:41:15
 string Datetime::utcToLocalString(time_t utc)
 {
-	tm tmDateTime;
-
-	localtime_r(&utc, &tmDateTime);
+	tm tmDateTime = utcSecondsToLocalTime(utc);
 
 	return std::format(
 		"{:0>4}-{:0>2}-{:0>2}T{:0>2}:{:0>2}:{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
 		tmDateTime.tm_min, tmDateTime.tm_sec
 	);
+}
+
+time_t Datetime::utcToLocal(time_t utc)
+{
+	tm tmDateTime = utcSecondsToLocalTime(utc);
+
+	return localToUTC(&tmDateTime);
 }
 
 // 2021-02-26T15:41:15.477+0100 (ISO8610)
