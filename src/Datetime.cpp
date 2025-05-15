@@ -506,13 +506,6 @@ string Datetime::utcToLocalString(time_t utc)
 	);
 }
 
-time_t Datetime::utcToLocal(time_t utc)
-{
-	tm tmDateTime = utcSecondsToLocalTime(utc);
-
-	return localToUTC(&tmDateTime);
-}
-
 // 2021-02-26T15:41:15.477+0100 (ISO8610)
 // 2021-02-26T15:41:15.477Z
 int64_t Datetime::sDateMilliSecondsToUtc(string sDate)

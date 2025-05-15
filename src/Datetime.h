@@ -138,7 +138,6 @@ class Datetime
 	static int64_t sDateMilliSecondsToUtc(string sDate);
 	static string utcToUtcString(time_t utc);
 	static string utcToLocalString(time_t utc);
-	static time_t utcToLocal(time_t utc);
 };
 
 #endif
