@@ -82,6 +82,7 @@ class Datetime
 			tmDateTime. tm_isdst	 -1;
 	*/
 	static void convertFromLocalToUTC(tm *ptmDateTime, time_t *ptUTCTime);
+	static time_t localToUTC(tm *ptmDateTime);
 
 	static void convertFromLocalToUTC(tm *ptmLocalDateTime, tm *ptmUTCDateTime);
 

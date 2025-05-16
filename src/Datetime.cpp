@@ -24,11 +24,13 @@
 // #include <string>
 
 #include "Datetime.h"
+#include <stdexcept>
 #ifdef WIN32
 #include <Windows.h>
 #else
 #include <sys/time.h>
 #endif
+// #include "spdlog/spdlog.h"
 #include <format>
 /*
 #include <stdio.h>
@@ -155,6 +157,8 @@ string Datetime::nowLocalTime(unsigned long ulTextFormat)
 			", ulTextFormat: {}",
 			ulTextFormat
 		);
+		// SPDLOG_ERROR(errorMessage);
+
 		throw runtime_error(errorMessage);
 	}
 
@@ -192,6 +196,7 @@ void Datetime::getTimeZoneInformation(long *plTimeZoneDifferenceInHours)
 	if (::gettimeofday(&tv, &tz) != 0)
 	{
 		string errorMessage = std::format("gettimeofday failed");
+		// SPDLOG_ERROR(errorMessage);
 		throw runtime_error(errorMessage);
 	}
 
@@ -232,6 +237,7 @@ void Datetime::get_tm_LocalTime(tm *ptmDateTime, unsigned long *pulMilliSecs)
 	if (gettimeofday(&tvTimeval, NULL) == -1)
 	{
 		string errorMessage = std::format("gettimeofday failed");
+		// SPDLOG_ERROR(errorMessage);
 		throw runtime_error(errorMessage);
 	}
 
@@ -241,7 +247,9 @@ void Datetime::get_tm_LocalTime(tm *ptmDateTime, unsigned long *pulMilliSecs)
 #endif
 }
 
-void Datetime::convertFromLocalToUTC(tm *ptmDateTime, time_t *ptUTCTime) { *ptUTCTime = mktime(ptmDateTime); }
+void Datetime::convertFromLocalToUTC(tm *ptmDateTime, time_t *ptUTCTime) { *ptUTCTime = localToUTC(ptmDateTime); }
+
+time_t Datetime::localToUTC(tm *ptmDateTime) { return mktime(ptmDateTime); }
 
 void Datetime::convertFromLocalToUTC(tm *ptmLocalDateTime, tm *ptmUTCDateTime)
 {
@@ -292,14 +300,17 @@ void Datetime::convertFromUTCToLocal(time_t tUTCTime, tm *ptmLocalDateTime)
 	if (localtime_r(&tUTCTime, ptmLocalDateTime) == (struct tm *)NULL)
 #endif
 	{
-		Error err = ToolsErrors(__FILE__, __LINE__, TOOLS_LOCALTIME_R_FAILED);
+		string errorMessage = std::format("localtime_r failed");
+		// SPDLOG_ERROR(errorMessage);
 
-		return err;
+		throw runtime_error(errorMessage);
 	}
 #else
 	if ((ptmLocalDateTime = localtime(&tUTCTime)) == (struct tm *)NULL)
 	{
 		string errorMessage = std::format("localtime failed");
+		// SPDLOG_ERROR(errorMessage);
+
 		throw runtime_error(errorMessage);
 	}
 #endif
@@ -389,6 +400,7 @@ void Datetime::getLastDayOfMonth(unsigned long ulYear, unsigned long ulMonth, un
 			", ulMonth: {}",
 			ulMonth
 		);
+		// SPDLOG_ERROR(errorMessage);
 		throw runtime_error(errorMessage);
 	}
 
@@ -423,6 +435,7 @@ time_t Datetime::sDateSecondsToUtc(string sDate)
 			", sscanfReturn: {}",
 			sDate, sscanfReturn
 		);
+		// SPDLOG_ERROR(errorMessage);
 
 		throw runtime_error(errorMessage);
 	}
@@ -485,9 +498,7 @@ string Datetime::utcToUtcString(time_t utc)
 // 2021-02-26T15:41:15
 string Datetime::utcToLocalString(time_t utc)
 {
-	tm tmDateTime;
-
-	localtime_r(&utc, &tmDateTime);
+	tm tmDateTime = utcSecondsToLocalTime(utc);
 
 	return std::format(
 		"{:0>4}-{:0>2}-{:0>2}T{:0>2}:{:0>2}:{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
@@ -537,6 +548,7 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 			", sDate: {}",
 			sDate
 		);
+		// SPDLOG_ERROR(errorMessage);
 
 		throw runtime_error(errorMessage);
 	}
@@ -554,6 +566,7 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 				", sscanfReturn: {}",
 				sDate, sscanfReturn
 			);
+			// SPDLOG_ERROR(errorMessage);
 
 			throw runtime_error(errorMessage);
 		}
@@ -570,6 +583,7 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 				", sscanfReturn: {}",
 				sDate, sscanfReturn
 			);
+			// SPDLOG_ERROR(errorMessage);
 
 			throw runtime_error(errorMessage);
 		}
