@@ -483,7 +483,7 @@ time_t Datetime::parseUtcStringToUtcInSecs(const string &datetime)
 }
 
 // 2021-02-26T15:41:15.765Z
-long long Datetime::parseUtcStringToUtcInMillisecs(const string &datetime)
+int64_t Datetime::parseUtcStringToUtcInMillisecs(const string &datetime)
 {
 	// return Datetime::parseUtcStringToUtcInSecs(datetime) * 1000;
 	std::tm tm = {};
@@ -508,7 +508,7 @@ long long Datetime::parseUtcStringToUtcInMillisecs(const string &datetime)
 #else
 	time_t seconds = timegm(&tm);
 #endif
-	return static_cast<long long>(seconds) * 1000 + millis;
+	return static_cast<int64_t>(seconds) * 1000 + millis;
 }
 
 // HH:MM
