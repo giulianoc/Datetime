@@ -25,7 +25,7 @@
 
 #include "Datetime.h"
 #include <stdexcept>
-#ifdef WIN32
+#ifdef _WIN32
 #include <Windows.h>
 #else
 #include <sys/time.h>
@@ -44,7 +44,11 @@ string Datetime::timePointAsLocalString(chrono::system_clock::time_point t)
 	tm tmDateTime;
 	// char strDateTime[64];
 	time_t utcTime = chrono::system_clock::to_time_t(t);
+#ifdef WIN32
+	localtime_s(&tmDateTime, &utcTime);
+#else
 	localtime_r(&utcTime, &tmDateTime);
+#endif
 
 	return std::format(
 		"{:0>4}-{:0>2}-{:0>2} {:0>2}:{:0>2}:{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
@@ -58,7 +62,11 @@ string Datetime::timePointAsUtcString(chrono::system_clock::time_point t)
 	tm tmDateTime;
 	// char strDateTime[64];
 	time_t utcTime = chrono::system_clock::to_time_t(t);
+#ifdef _WIN32
+	gmtime_s(&tmDateTime, &utcTime);
+#else
 	gmtime_r(&utcTime, &tmDateTime);
+#endif
 
 	return std::format(
 		"{:0>4}-{:0>2}-{:0>2}T{:0>2}:{:0>2}:{:0>2}Z", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
@@ -68,7 +76,11 @@ string Datetime::timePointAsUtcString(chrono::system_clock::time_point t)
 
 string Datetime::localToUtcString(tm localTime)
 {
+#ifdef _WIN32
+	time_t utcTime = _mkgmtime(&localTime);
+#else
 	time_t utcTime = timegm(&localTime);
+#endif
 
 	return utcToUtcString(utcTime);
 }
@@ -77,33 +89,30 @@ tm Datetime::utcSecondsToLocalTime(time_t utcTime)
 {
 	tm tmDateTime;
 
+#ifdef _WIN32
+	localtime_s(&tmDateTime, &utcTime);
+#else
 	localtime_r(&utcTime, &tmDateTime);
+#endif
 	return tmDateTime;
 }
 
 void Datetime::nowUTCInMilliSecs(unsigned long long *pullNowUTCInSecs, unsigned long *pulAdditionalMilliSecs, long *plTimeZoneDifferenceInHours)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME stSystemTime;
 #else
 	struct timeval tvTimeval;
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 	GetLocalTime(&stSystemTime);
 
 	(*pullNowUTCInSecs) = time(NULL);
 	(*pulAdditionalMilliSecs) = stSystemTime.wMilliseconds;
 
 	if (plTimeZoneDifferenceInHours != (long *)NULL)
-	{
-		if (Datetime::getTimeZoneInformation(plTimeZoneDifferenceInHours) != errNoError)
-		{
-			Error err = ToolsErrors(__FILE__, __LINE__, TOOLS_DATETIME_GETTIMEZONEINFORMATION_FAILED);
-
-			return err;
-		}
-	}
+		Datetime::getTimeZoneInformation(plTimeZoneDifferenceInHours);
 #else
 	if (plTimeZoneDifferenceInHours != (long *)NULL)
 	{
@@ -178,7 +187,7 @@ string Datetime::nowLocalTime(unsigned long ulTextFormat)
 
 void Datetime::getTimeZoneInformation(long *plTimeZoneDifferenceInHours)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	TIME_ZONE_INFORMATION tzInfo;
 
 	if (::GetTimeZoneInformation(&tzInfo) == TIME_ZONE_ID_INVALID)
@@ -215,18 +224,13 @@ long Datetime::getTimeZoneInformation(void)
 
 void Datetime::get_tm_LocalTime(tm *ptmDateTime, unsigned long *pulMilliSecs)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	time_t tTime;
 	SYSTEMTIME stSystemTime;
 
 	tTime = time(NULL);
 
-	if (Datetime::convertFromUTCToLocal(tTime, ptmDateTime) != errNoError)
-	{
-		Error err = ToolsErrors(__FILE__, __LINE__, TOOLS_DATETIME_CONVERTFROMUTCTOLOCAL_FAILED);
-
-		return err;
-	}
+	Datetime::convertFromUTCToLocal(tTime, ptmDateTime);
 
 	GetLocalTime(&stSystemTime);
 
@@ -260,7 +264,14 @@ void Datetime::convertFromLocalToUTC(tm *ptmLocalDateTime, tm *ptmUTCDateTime)
 	convertFromUTCInSecondsToBreakDownUTC(tUTCTime, ptmUTCDateTime);
 }
 
-void Datetime::convertFromUTCInSecondsToBreakDownUTC(time_t tUTCTime, tm *ptmUTCDateTime) { gmtime_r(&tUTCTime, ptmUTCDateTime); }
+void Datetime::convertFromUTCInSecondsToBreakDownUTC(time_t tUTCTime, tm *ptmUTCDateTime)
+{
+#ifdef _WIN32
+	gmtime_s(ptmUTCDateTime, &tUTCTime);
+#else
+	gmtime_r(&tUTCTime, ptmUTCDateTime);
+#endif
+}
 
 void Datetime::convertFromLocalDateTimeToLocalInSecs(
 	unsigned long ulYear, unsigned long ulMon, unsigned long ulDay, unsigned long ulHour, unsigned long ulMin, unsigned long ulSec,
@@ -293,26 +304,10 @@ void Datetime::convertFromLocalDateTimeToLocalInSecs(
 
 void Datetime::convertFromUTCToLocal(time_t tUTCTime, tm *ptmLocalDateTime)
 {
-#ifdef _REENTRANT
-#if defined(__hpux) && defined(_CMA__HP)
-	if (localtime_r(&tUTCTime, ptmLocalDateTime))
+#ifdef _WIN32
+	localtime_s(ptmLocalDateTime, &tUTCTime);
 #else
-	if (localtime_r(&tUTCTime, ptmLocalDateTime) == (struct tm *)NULL)
-#endif
-	{
-		string errorMessage = std::format("localtime_r failed");
-		// SPDLOG_ERROR(errorMessage);
-
-		throw runtime_error(errorMessage);
-	}
-#else
-	if ((ptmLocalDateTime = localtime(&tUTCTime)) == (struct tm *)NULL)
-	{
-		string errorMessage = std::format("localtime failed");
-		// SPDLOG_ERROR(errorMessage);
-
-		throw runtime_error(errorMessage);
-	}
+	localtime_r(&tUTCTime, ptmLocalDateTime);
 #endif
 }
 
@@ -425,9 +420,15 @@ time_t Datetime::sDateSecondsToUtc(string sDate)
 	tm tmDate;
 	int sscanfReturn;
 
+#ifdef _WIN32
+	if ((sscanfReturn =
+			 sscanf_s(sDate.c_str(), "%4lu-%2lu-%2luT%2lu:%2lu:%2luZ", &ulUTCYear, &ulUTCMonth, &ulUTCDay, &ulUTCHour, &ulUTCMinutes, &ulUTCSeconds)
+		) != 6)
+#else
 	if ((sscanfReturn =
 			 sscanf(sDate.c_str(), "%4lu-%2lu-%2luT%2lu:%2lu:%2luZ", &ulUTCYear, &ulUTCMonth, &ulUTCDay, &ulUTCHour, &ulUTCMinutes, &ulUTCSeconds)) !=
 		6)
+#endif
 	{
 		string errorMessage = std::format(
 			"Field has a wrong format (sscanf failed)"
@@ -443,7 +444,11 @@ time_t Datetime::sDateSecondsToUtc(string sDate)
 	time_t utcTime;
 
 	time(&utcTime);
+#ifdef _WIN32
+	gmtime_s(&tmDate, &utcTime);
+#else
 	gmtime_r(&utcTime, &tmDate);
+#endif
 
 	tmDate.tm_year = ulUTCYear - 1900;
 	tmDate.tm_mon = ulUTCMonth - 1;
@@ -452,7 +457,11 @@ time_t Datetime::sDateSecondsToUtc(string sDate)
 	tmDate.tm_min = ulUTCMinutes;
 	tmDate.tm_sec = ulUTCSeconds;
 
+#ifdef _WIN32
+	utcTime = _mkgmtime(&tmDate);
+#else
 	utcTime = timegm(&tmDate);
+#endif
 
 	return utcTime;
 }
@@ -467,7 +476,11 @@ long Datetime::sTimeToMilliSecs(string sTime)
 	int minutes;
 	int sscanfReturn;
 
+#ifdef _WIN32
+	if ((sscanfReturn = sscanf_s(sTime.c_str(), "%2d:%2d", &hours, &minutes)) != 2)
+#else
 	if ((sscanfReturn = sscanf(sTime.c_str(), "%2d:%2d", &hours, &minutes)) != 2)
+#endif
 	{
 		string errorMessage = std::format(
 			"Field has a wrong format (sscanf failed)"
@@ -487,7 +500,11 @@ string Datetime::utcToUtcString(time_t utc)
 {
 	tm tmDateTime;
 
+#ifdef _WIN32
+	gmtime_s(&tmDateTime, &utc);
+#else
 	gmtime_r(&utc, &tmDateTime);
+#endif
 
 	return std::format(
 		"{:0>4}-{:0>2}-{:0>2}T{:0>2}:{:0>2}:{:0>2}Z", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
@@ -555,10 +572,17 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 
 	if (sDate.size() == 28)
 	{
+#ifdef _WIN32
+		if ((sscanfReturn = sscanf_s(
+				 sDate.c_str(), dateFormat.c_str(), &ulUTCYear, &ulUTCMonth, &ulUTCDay, &ulUTCHour, &ulUTCMinutes, &ulUTCSeconds, &ulUTCMilliSeconds,
+				 &ulHourTimeZone, &ulMinuteTimeZone
+			 )) != 9)
+#else
 		if ((sscanfReturn = sscanf(
 				 sDate.c_str(), dateFormat.c_str(), &ulUTCYear, &ulUTCMonth, &ulUTCDay, &ulUTCHour, &ulUTCMinutes, &ulUTCSeconds, &ulUTCMilliSeconds,
 				 &ulHourTimeZone, &ulMinuteTimeZone
 			 )) != 9)
+#endif
 		{
 			string errorMessage = std::format(
 				"Field has a wrong format (sscanf failed)"
@@ -573,9 +597,15 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 	}
 	else
 	{
+#ifdef _WIN32
+		if ((sscanfReturn = sscanf_s(
+				 sDate.c_str(), dateFormat.c_str(), &ulUTCYear, &ulUTCMonth, &ulUTCDay, &ulUTCHour, &ulUTCMinutes, &ulUTCSeconds, &ulUTCMilliSeconds
+			 )) != 7)
+#else
 		if ((sscanfReturn = sscanf(
 				 sDate.c_str(), dateFormat.c_str(), &ulUTCYear, &ulUTCMonth, &ulUTCDay, &ulUTCHour, &ulUTCMinutes, &ulUTCSeconds, &ulUTCMilliSeconds
 			 )) != 7)
+#endif
 		{
 			string errorMessage = std::format(
 				"Field has a wrong format (sscanf failed)"
@@ -593,7 +623,11 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 		time_t utcTime;
 
 		time(&utcTime);
+#ifdef _WIN32
+		gmtime_s(&tmDate, &utcTime);
+#else
 		gmtime_r(&utcTime, &tmDate);
+#endif
 
 		tmDate.tm_year = ulUTCYear - 1900;
 		tmDate.tm_mon = ulUTCMonth - 1;
@@ -603,7 +637,11 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 		tmDate.tm_sec = ulUTCSeconds;
 	}
 
+#ifdef _WIN32
+	int64_t utcTime = _mkgmtime(&tmDate) * 1000;
+#else
 	int64_t utcTime = timegm(&tmDate) * 1000;
+#endif
 	utcTime += ulUTCMilliSeconds;
 
 	if (signTimeZone == '+')
