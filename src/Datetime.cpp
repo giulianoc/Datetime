@@ -24,6 +24,7 @@
 // #include <string>
 
 #include "Datetime.h"
+#include <iomanip>
 #include <stdexcept>
 #ifdef _WIN32
 #include <Windows.h>
