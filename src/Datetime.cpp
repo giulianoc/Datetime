@@ -190,12 +190,7 @@ void Datetime::getTimeZoneInformation(long *plTimeZoneDifferenceInHours)
 #ifdef _WIN32
 	TIME_ZONE_INFORMATION tzInfo;
 
-	if (::GetTimeZoneInformation(&tzInfo) == TIME_ZONE_ID_INVALID)
-	{
-		Error err = ToolsErrors(__FILE__, __LINE__, TOOLS_GETTIMEZONEINFORMATION_FAILED);
-
-		return err;
-	}
+	::GetTimeZoneInformation(&tzInfo);
 
 	*plTimeZoneDifferenceInHours = ((tzInfo.Bias / 60) * (-1));
 #else
