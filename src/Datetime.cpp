@@ -402,6 +402,7 @@ void Datetime::getLastDayOfMonth(unsigned long ulYear, unsigned long ulMonth, un
 		(*pulLastDayOfMonth) += 1;
 }
 
+/* sostituita da parseUtcStringToTimeT
 // 2021-02-26T15:41:15Z
 time_t Datetime::sDateSecondsToUtc(string sDate)
 {
@@ -460,9 +461,54 @@ time_t Datetime::sDateSecondsToUtc(string sDate)
 
 	return utcTime;
 }
+*/
 
 // 2021-02-26T15:41:15Z
-time_t Datetime::sDateSecondsToUtcInMs(string sDate) { return Datetime::sDateSecondsToUtc(sDate) * 1000; }
+time_t Datetime::parseUtcStringToUtcInSecs(const string &datetime)
+{
+	// E' importante che la stringa abbia sempre la Z finale (Z = Zulu = UTC)
+	tm tm = {};
+	istringstream ss(datetime);
+	ss >> get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
+	if (ss.fail())
+		throw runtime_error(std::format("Parsing datetime failed. datetime: {}", datetime));
+
+	// timegm interpreta la tm come UTC
+#ifdef _WIN32
+	return _mkgmtime(&tm);
+#else
+	return timegm(&tm);
+#endif
+}
+
+// 2021-02-26T15:41:15.765Z
+long long Datetime::parseUtcStringToUtcInMillisecs(const string &datetime)
+{
+	// return Datetime::parseUtcStringToUtcInSecs(datetime) * 1000;
+	std::tm tm = {};
+	int millis = 0;
+
+	// Estrae parte con millisecondi
+	std::istringstream ss(datetime);
+	char discard;
+	ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%S");
+	if (ss.fail())
+		throw runtime_error(std::format("Parsing datetime failed. datetime: {}", datetime));
+	ss >> discard; // '.' prima dei millisecondi
+	if (ss.fail())
+		throw runtime_error(std::format("Parsing datetime failed. datetime: {}", datetime));
+	ss >> millis;
+	if (ss.fail())
+		throw runtime_error(std::format("Parsing datetime failed. datetime: {}", datetime));
+
+	// timegm interpreta la tm come UTC
+#ifdef _WIN32
+	time_t seconds = _mkgmtime(&tm);
+#else
+	time_t seconds = timegm(&tm);
+#endif
+	return static_cast<long long>(seconds) * 1000 + millis;
+}
 
 // HH:MM
 long Datetime::sTimeToMilliSecs(string sTime)

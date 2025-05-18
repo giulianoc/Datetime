@@ -133,8 +133,8 @@ class Datetime
 	static void getLastDayOfMonth(unsigned long ulYear, unsigned long ulMonth, unsigned long *pulLastDayOfMonth);
 
 	static long sTimeToMilliSecs(string sTime);
-	static time_t sDateSecondsToUtc(string sDate);
-	static time_t sDateSecondsToUtcInMs(string sDate);
+	static time_t parseUtcStringToUtcInSecs(const string &datetime);
+	static long long parseUtcStringToUtcInMillisecs(const string &datetime);
 	static int64_t sDateMilliSecondsToUtc(string sDate);
 	static string utcToUtcString(time_t utc);
 	static string utcToLocalString(time_t utc);

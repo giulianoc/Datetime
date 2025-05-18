@@ -21,12 +21,13 @@
 # with the authors.
 
 SET (SOURCES
-	datetime.cpp
+	dateTime.cpp
 )
 
 SET (HEADERS
 )
 
+include_directories(${DATETIME_INCLUDE_DIR})
 if(CRYPTO_FOUND)
 	include_directories(${CRYPTO_INCLUDE_DIR})
 endif()
@@ -34,9 +35,11 @@ if (ZLIB_FOUND)
 	include_directories(${ZLIB_INCLUDE_DIRS})
 endif()
 
-add_compile_options(-D_REENTRANT)
+#add_compile_options(-D_REENTRANT)
 
 add_executable(datetime ${SOURCES} ${HEADERS})
+
+target_link_libraries (datetime Datetime)
 
 target_link_libraries (datetime crypto)
 if(CRYPTO_FOUND)

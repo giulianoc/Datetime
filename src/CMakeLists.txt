@@ -32,7 +32,7 @@ SET (HEADERS
 
 add_library (Datetime SHARED ${SOURCES} ${HEADERS})
 
-target_compile_definitions(Datetime PRIVATE _REENTRANT)
+#target_compile_definitions(Datetime PRIVATE _REENTRANT)
 target_compile_definitions(Datetime PRIVATE _FILE_OFFSET_BITS=64)
 
 if(ZORAC)

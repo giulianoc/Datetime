@@ -22,11 +22,14 @@
 */
 
 #include "Datetime.h"
+#include <iostream>
 #ifdef WIN32
 #include <windows.h>
 #else
 #include <unistd.h>
 #endif
+
+using namespace std;
 
 int main()
 
@@ -56,7 +59,7 @@ int main()
 	Datetime::nowUTCInMilliSecs(&ullNowUTCInMilliSecs, &lTimeZoneDifferenceInHours);
 #endif
 
-	std::cout << "  NowUTCInMilliSecs: " << ullNowUTCInMilliSecs << ", TimeZoneDifferenceInHours: " << lTimeZoneDifferenceInHours << std::endl;
+	cout << "  NowUTCInMilliSecs: " << ullNowUTCInMilliSecs << ", TimeZoneDifferenceInHours: " << lTimeZoneDifferenceInHours << endl;
 
 	Datetime::get_tm_LocalTime(&tmDateTime, &ulMilliSecs);
 
@@ -65,7 +68,7 @@ int main()
 		tmDateTime.tm_sec, -1, &ullUTCInSecs
 	);
 
-	std::cout << "Calculated UTC time: " << ullUTCInSecs * 1000 << std::endl;
+	cout << "Calculated UTC time: " << ullUTCInSecs * 1000 << endl;
 
 	ulYear = tmDateTime.tm_year + 1900;
 	ulMonth = tmDateTime.tm_mon + 1;
@@ -74,16 +77,16 @@ int main()
 	ulMinutes = tmDateTime.tm_min;
 	ulSeconds = tmDateTime.tm_sec;
 
-	std::cout << "today: " << tmDateTime.tm_year + 1900 << "/" << tmDateTime.tm_mon + 1 << "/" << tmDateTime.tm_mday << " " << tmDateTime.tm_hour
-			  << ":" << tmDateTime.tm_min << ":" << tmDateTime.tm_sec << std::endl;
+	cout << "today: " << tmDateTime.tm_year + 1900 << "/" << tmDateTime.tm_mon + 1 << "/" << tmDateTime.tm_mday << " " << tmDateTime.tm_hour << ":"
+		 << tmDateTime.tm_min << ":" << tmDateTime.tm_sec << endl;
 
 	Datetime::addSeconds(
 		tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour, tmDateTime.tm_min, tmDateTime.tm_sec, -1,
 		365 * 24 * 3600, &ulYear, &ulMonth, &ulDay, &ulHour, &ulMinutes, &ulSeconds, &bDaylightSavingTime
 	);
 
-	std::cout << "today + 365 days: " << ulYear << "/" << ulMonth << "/" << ulDay << " " << ulHour << ":" << ulMinutes << ":" << ulSeconds
-			  << ", daylight saving time: " << bDaylightSavingTime << std::endl;
+	cout << "today + 365 days: " << ulYear << "/" << ulMonth << "/" << ulDay << " " << ulHour << ":" << ulMinutes << ":" << ulSeconds
+		 << ", daylight saving time: " << bDaylightSavingTime << endl;
 
 	return 0;
 }
