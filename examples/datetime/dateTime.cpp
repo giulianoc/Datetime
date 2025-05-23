@@ -35,7 +35,7 @@ int main()
 
 {
 
-#ifdef WIN32
+#ifdef _WIN32
 	__int64 ullNowUTCInMilliSecs;
 	__int64 ullUTCInSecs;
 #else
@@ -53,11 +53,7 @@ int main()
 	unsigned long ulSeconds;
 	bool bDaylightSavingTime;
 
-#ifdef WIN32
 	Datetime::nowUTCInMilliSecs(&ullNowUTCInMilliSecs, &lTimeZoneDifferenceInHours);
-#else
-	Datetime::nowUTCInMilliSecs(&ullNowUTCInMilliSecs, &lTimeZoneDifferenceInHours);
-#endif
 
 	cout << "  NowUTCInMilliSecs: " << ullNowUTCInMilliSecs << ", TimeZoneDifferenceInHours: " << lTimeZoneDifferenceInHours << endl;
 
