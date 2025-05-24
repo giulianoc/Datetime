@@ -35,13 +35,8 @@ int main()
 
 {
 
-#ifdef _WIN32
-	__int64 ullNowUTCInMilliSecs;
-	__int64 ullUTCInSecs;
-#else
 	unsigned long long ullNowUTCInMilliSecs;
 	unsigned long long ullUTCInSecs;
-#endif
 	tm tmDateTime;
 	unsigned long ulMilliSecs;
 	long lTimeZoneDifferenceInHours;
