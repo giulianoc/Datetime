@@ -20,6 +20,7 @@ nbproject
 
 #ignora i seguenti eseguibili
 examples/trim/trim
+examples/datetime/datetime
 
 *.cgi
 *.fcgi
