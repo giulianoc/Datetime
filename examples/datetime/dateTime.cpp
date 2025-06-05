@@ -23,7 +23,7 @@
 
 #include "Datetime.h"
 #include <iostream>
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -35,13 +35,8 @@ int main()
 
 {
 
-#ifdef WIN32
-	__int64 ullNowUTCInMilliSecs;
-	__int64 ullUTCInSecs;
-#else
 	unsigned long long ullNowUTCInMilliSecs;
 	unsigned long long ullUTCInSecs;
-#endif
 	tm tmDateTime;
 	unsigned long ulMilliSecs;
 	long lTimeZoneDifferenceInHours;
@@ -53,11 +48,7 @@ int main()
 	unsigned long ulSeconds;
 	bool bDaylightSavingTime;
 
-#ifdef WIN32
 	Datetime::nowUTCInMilliSecs(&ullNowUTCInMilliSecs, &lTimeZoneDifferenceInHours);
-#else
-	Datetime::nowUTCInMilliSecs(&ullNowUTCInMilliSecs, &lTimeZoneDifferenceInHours);
-#endif
 
 	cout << "  NowUTCInMilliSecs: " << ullNowUTCInMilliSecs << ", TimeZoneDifferenceInHours: " << lTimeZoneDifferenceInHours << endl;
 
