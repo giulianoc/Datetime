@@ -537,8 +537,7 @@ long Datetime::sTimeToMilliSecs(string sTime)
 	return (hours * 3600 + minutes * 60) * 1000;
 }
 
-// 2021-02-26T15:41:15Z
-string Datetime::utcToUtcString(time_t utc)
+string Datetime::utcToUtcString(time_t utc, Format format)
 {
 	tm tmDateTime;
 
@@ -548,21 +547,32 @@ string Datetime::utcToUtcString(time_t utc)
 	gmtime_r(&utc, &tmDateTime);
 #endif
 
-	return std::format(
-		"{:0>4}-{:0>2}-{:0>2}T{:0>2}:{:0>2}:{:0>2}Z", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
-		tmDateTime.tm_min, tmDateTime.tm_sec
-	);
+	switch (format)
+	{
+	case Format::YYYY_MM_DD:
+		return std::format("{:0>4}-{:0>2}-{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday);
+	default: // YYYY_MM_DD_HH_MI_SS
+		return std::format(
+			"{:0>4}-{:0>2}-{:0>2}T{:0>2}:{:0>2}:{:0>2}Z", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
+			tmDateTime.tm_min, tmDateTime.tm_sec
+		);
+	}
 }
 
-// 2021-02-26T15:41:15
-string Datetime::utcToLocalString(time_t utc)
+string Datetime::utcToLocalString(time_t utc, Format format)
 {
 	tm tmDateTime = utcSecondsToLocalTime(utc);
 
-	return std::format(
-		"{:0>4}-{:0>2}-{:0>2}T{:0>2}:{:0>2}:{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
-		tmDateTime.tm_min, tmDateTime.tm_sec
-	);
+	switch (format)
+	{
+	case Format::YYYY_MM_DD:
+		return std::format("{:0>4}-{:0>2}-{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday);
+	default: // YYYY_MM_DD_HH_MI_SS
+		return std::format(
+			"{:0>4}-{:0>2}-{:0>2}T{:0>2}:{:0>2}:{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
+			tmDateTime.tm_min, tmDateTime.tm_sec
+		);
+	}
 }
 
 // 2021-02-26T15:41:15.477+0100 (ISO8610)

@@ -32,6 +32,13 @@ using namespace std;
 class Datetime
 {
   public:
+	enum class Format
+	{
+		YYYY_MM_DD_HH_MI_SS = 0,
+		YYYY_MM_DD = 1
+	};
+
+  public:
 	static string timePointAsLocalString(chrono::system_clock::time_point t);
 	static string timePointAsUtcString(chrono::system_clock::time_point t);
 	static string localToUtcString(tm localTime);
@@ -136,8 +143,8 @@ class Datetime
 	static time_t parseUtcStringToUtcInSecs(const string &datetime);
 	static int64_t parseUtcStringToUtcInMillisecs(const string &datetime);
 	static int64_t sDateMilliSecondsToUtc(string sDate);
-	static string utcToUtcString(time_t utc);
-	static string utcToLocalString(time_t utc);
+	static string utcToUtcString(time_t utc, Format format = Format::YYYY_MM_DD_HH_MI_SS);
+	static string utcToLocalString(time_t utc, Format format = Format::YYYY_MM_DD_HH_MI_SS);
 };
 
 #endif
