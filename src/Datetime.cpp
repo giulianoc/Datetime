@@ -31,13 +31,7 @@
 #else
 #include <sys/time.h>
 #endif
-// #include "spdlog/spdlog.h"
 #include <format>
-/*
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-*/
 
 // 2021-02-26 15:41:15
 string Datetime::timePointAsLocalString(chrono::system_clock::time_point t)
