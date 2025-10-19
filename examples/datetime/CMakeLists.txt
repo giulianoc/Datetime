@@ -35,7 +35,9 @@ if (ZLIB_FOUND)
 	include_directories(${ZLIB_INCLUDE_DIRS})
 endif()
 
-#add_compile_options(-D_REENTRANT)
+if(APPLE)
+	link_directories("${OPENSSL_LIB_DIR}")
+endif()
 
 add_executable(datetime ${SOURCES} ${HEADERS})
 
