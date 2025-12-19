@@ -149,7 +149,7 @@ void Datetime::nowLocalInMilliSecs(unsigned long long *pullNowLocalInMilliSecs)
 	*pullNowLocalInMilliSecs = ullNowUTCInMilliSecs + (lTimeZoneDifferenceInHours * 3600 * 1000);
 }
 
-string Datetime::dateTimeFormat(uint64_t milliSecondsSinceEpoch, const string& outputFormat, const string& outputPrecision)
+string Datetime::dateTimeFormat(const uint64_t milliSecondsSinceEpoch, const string& outputFormat, const string& outputPrecision)
 {
 	// https://en.cppreference.com/w/cpp/chrono/system_clock/formatter.html
 	const string &_format = std::format("{{:{}}}", outputFormat);
@@ -184,7 +184,6 @@ string Datetime::dateTimeFormat(uint64_t milliSecondsSinceEpoch, const string& o
 
 string Datetime::dateTimeFormat(const tm &tm, const string& outputFormat)
 {
-
 	char buff[128];
 	// https://en.cppreference.com/w/c/chrono/strftime.html
 	if (!strftime(buff, sizeof buff, outputFormat.c_str(), &tm))
@@ -201,13 +200,15 @@ string Datetime::dateTimeFormat(const tm &tm, const string& outputFormat)
 	*/
 }
 
-string Datetime::nowLocalTime(const string& outputFormat)
+string Datetime::nowLocalTime(const string& outputFormat, const bool milliSeconds)
 {
 	tm tmDateTime{};
 	unsigned long ulMilliSecs;
 
 	Datetime::get_tm_LocalTime(&tmDateTime, &ulMilliSecs);
-	return dateTimeFormat(tmDateTime, outputFormat);
+	string sDateTime = dateTimeFormat(tmDateTime, outputFormat);
+
+	return milliSeconds ? std::format("{}.{:03}", sDateTime, ulMilliSecs) : sDateTime ;
 }
 
 /*

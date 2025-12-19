@@ -62,7 +62,7 @@ public:
 
 	static void nowLocalInMilliSecs(unsigned long long *pullNowLocalInMilliSecs);
 
-	static string nowLocalTime(const string& outputFormat = "%Y-%m-%dT%H:%M:%S");
+	static string nowLocalTime(const string& outputFormat = "%Y-%m-%dT%H:%M:%S", bool milliSeconds = false);
 	/*
 	// ulTextFormat:
 	// 	1: "YYYY-MM-DD HH:MI:SS"
