@@ -30,18 +30,18 @@ using namespace std;
 
 class Datetime
 {
+	/*
 public:
 	enum class Format
 	{
 		YYYY_MM_DD_HH_MI_SS = 0,
 		YYYY_MM_DD = 1
 	};
-
+	*/
   public:
 	static string dateTimeFormat(uint64_t milliSecondsSinceEpoch, const string& outputFormat = "%Y-%m-%dT%H:%M:%SZ",
 		const string& outputPrecision = "seconds");
-	static string dateTimeFormat(tm tm, const string& outputFormat);
-	static string nowLocalTime(const string& outputFormat);
+	static string dateTimeFormat(const tm &tm, const string& outputFormat = "%Y-%m-%dT%H:%M:%S");
 
 	static string timePointAsLocalString(chrono::system_clock::time_point t);
 	static string timePointAsUtcString(chrono::system_clock::time_point t);
@@ -62,10 +62,13 @@ public:
 
 	static void nowLocalInMilliSecs(unsigned long long *pullNowLocalInMilliSecs);
 
+	static string nowLocalTime(const string& outputFormat = "%Y-%m-%dT%H:%M:%S");
+	/*
 	// ulTextFormat:
 	// 	1: "YYYY-MM-DD HH:MI:SS"
 	// 	2: "YYYY_MM_DD"
 	static string nowLocalTime(unsigned long ulTextFormat);
+	*/
 
 	static void getTimeZoneInformation(long *plTimeZoneDifferenceInHours);
 
@@ -147,6 +150,9 @@ public:
 	static time_t parseUtcStringToUtcInSecs(const string &datetime);
 	static int64_t parseUtcStringToUtcInMillisecs(const string &datetime);
 	static int64_t sDateMilliSecondsToUtc(string sDate);
-	static string utcToUtcString(time_t utc, Format format = Format::YYYY_MM_DD_HH_MI_SS);
-	static string utcToLocalString(time_t utc, Format format = Format::YYYY_MM_DD_HH_MI_SS);
+	static string utcToUtcString(time_t utc, const string& outputFormat = "%Y-%m-%dT%H:%M:%SZ",
+		const string& outputPrecision = "seconds");
+	// static string utcToUtcString(time_t utc, Format format = Format::YYYY_MM_DD_HH_MI_SS);
+	static string utcToLocalString(time_t utc, const string& outputFormat = "%Y-%m-%dT%H:%M:%S");
+	// static string utcToLocalString(time_t utc, Format format = Format::YYYY_MM_DD_HH_MI_SS);
 };

@@ -48,10 +48,16 @@ int main()
 	unsigned long ulSeconds;
 	bool bDaylightSavingTime;
 
-	cout << "nowLocalTime: " << Datetime::nowLocalTime(1) << endl;
-	cout << "nowLocalTime: " << Datetime::nowLocalTime("{:04}-{:02}-{:02} {:02}:{:02}:{:02}") << endl;
+	// cout << "nowLocalTime: " << Datetime::nowLocalTime(1) << endl;
+	cout << "nowLocalTime: " << Datetime::nowLocalTime() << endl;
 	// nella futura implementazione di libc potremo usare il formato sotto (vedi implementazione della funzione Datetime::nowLocalTime
 	// cout << "nowLocalTime2: " << Datetime::nowLocalTime("%Y-%m-%d %H:%M:%S") << endl;
+
+	cout << "utcToUtcString: " << Datetime::utcToUtcString(1765893300) << endl;
+	// cout << "utcToUtcString: " << Datetime::utcToUtcString(1765893300, Datetime::Format::YYYY_MM_DD_HH_MI_SS) << endl;
+
+	// cout << "utcToLocalString: " << Datetime::utcToLocalString(chrono::system_clock::to_time_t(chrono::system_clock::now())) << endl;
+	cout << "utcToLocalString: " << Datetime::utcToLocalString(chrono::system_clock::to_time_t(chrono::system_clock::now())) << endl;
 
 	Datetime::nowUTCInMilliSecs(&ullNowUTCInMilliSecs, &lTimeZoneDifferenceInHours);
 

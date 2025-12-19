@@ -182,19 +182,15 @@ string Datetime::dateTimeFormat(uint64_t milliSecondsSinceEpoch, const string& o
 	throw std::runtime_error(std::format("precision '{}' is not supported", outputPrecision));
 }
 
-string Datetime::dateTimeFormat(tm tm, const string& outputFormat)
+string Datetime::dateTimeFormat(const tm &tm, const string& outputFormat)
 {
 
-	int year   = tm.tm_year + 1900;
-	int month  = tm.tm_mon + 1;
-	int day    = tm.tm_mday;
-	int hour   = tm.tm_hour;
-	int minute = tm.tm_min;
-	int second = tm.tm_sec;
+	char buff[128];
+	// https://en.cppreference.com/w/c/chrono/strftime.html
+	if (!strftime(buff, sizeof buff, outputFormat.c_str(), &tm))
+		throw runtime_error("strftime failed");
 
-	return std::vformat(outputFormat,
-	std::make_format_args(year, month, day, hour, minute, second)
-	);
+	return {buff};
 
 	// la libc dovrebbe implementare make_format_args(tm), quando sarà implementato il codice sopra
 	// sara sostituito da:
@@ -214,6 +210,7 @@ string Datetime::nowLocalTime(const string& outputFormat)
 	return dateTimeFormat(tmDateTime, outputFormat);
 }
 
+/*
 string Datetime::nowLocalTime(unsigned long ulTextFormat)
 {
 	tm tmDateTime;
@@ -244,6 +241,7 @@ string Datetime::nowLocalTime(unsigned long ulTextFormat)
 
 	return sDateTime;
 }
+*/
 
 void Datetime::getTimeZoneInformation(long *plTimeZoneDifferenceInHours)
 {
@@ -596,6 +594,12 @@ long Datetime::sTimeToMilliSecs(string sTime)
 	return (hours * 3600 + minutes * 60) * 1000;
 }
 
+string Datetime::utcToUtcString(const time_t utc, const string& outputFormat, const string& outputPrecision)
+{
+	return dateTimeFormat(utc * 1000, outputFormat, outputPrecision);
+}
+
+/*
 string Datetime::utcToUtcString(time_t utc, Format format)
 {
 	tm tmDateTime;
@@ -617,7 +621,15 @@ string Datetime::utcToUtcString(time_t utc, Format format)
 		);
 	}
 }
+*/
 
+string Datetime::utcToLocalString(const time_t utc, const string& outputFormat)
+{
+	tm tmDateTime = utcSecondsToLocalTime(utc);
+	return dateTimeFormat(tmDateTime, outputFormat);
+}
+
+/*
 string Datetime::utcToLocalString(time_t utc, Format format)
 {
 	tm tmDateTime = utcSecondsToLocalTime(utc);
@@ -633,6 +645,7 @@ string Datetime::utcToLocalString(time_t utc, Format format)
 		);
 	}
 }
+*/
 
 // 2021-02-26T15:41:15.477+0100 (ISO8610)
 // 2021-02-26T15:41:15.477Z
