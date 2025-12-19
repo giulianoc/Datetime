@@ -185,8 +185,6 @@ string Datetime::dateTimeFormat(uint64_t milliSecondsSinceEpoch, const string& o
 string Datetime::dateTimeFormat(tm tm, const string& outputFormat)
 {
 
-#ifdef __APPLE__
-	// Apple non ha ancora implementato make_format_args(tm)
 	int year   = tm.tm_year + 1900;
 	int month  = tm.tm_mon + 1;
 	int day    = tm.tm_mday;
@@ -197,11 +195,14 @@ string Datetime::dateTimeFormat(tm tm, const string& outputFormat)
 	return std::vformat(outputFormat,
 	std::make_format_args(year, month, day, hour, minute, second)
 	);
-#else
+
+	// la libc dovrebbe implementare make_format_args(tm), quando sarà implementato il codice sopra
+	// sara sostituito da:
+	/*
 	// https://en.cppreference.com/w/cpp/chrono/system_clock/formatter.html
 	const string &_format = std::format("{{:{}}}", outputFormat);
 	return std::vformat(_format,make_format_args(tm));
-#endif
+	*/
 }
 
 string Datetime::nowLocalTime(const string& outputFormat)

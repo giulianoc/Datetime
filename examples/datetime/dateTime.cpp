@@ -49,11 +49,9 @@ int main()
 	bool bDaylightSavingTime;
 
 	cout << "nowLocalTime: " << Datetime::nowLocalTime(1) << endl;
-#ifdef __APPLE__
-	cout << "nowLocalTime2: " << Datetime::nowLocalTime("{:04}-{:02}-{:02} {:02}:{:02}:{:02}") << endl;
-#else
-	cout << "nowLocalTime2: " << Datetime::nowLocalTime("%Y-%m-%d %H:%M:%S") << endl;
-#endif
+	cout << "nowLocalTime: " << Datetime::nowLocalTime("{:04}-{:02}-{:02} {:02}:{:02}:{:02}") << endl;
+	// nella futura implementazione di libc potremo usare il formato sotto (vedi implementazione della funzione Datetime::nowLocalTime
+	// cout << "nowLocalTime2: " << Datetime::nowLocalTime("%Y-%m-%d %H:%M:%S") << endl;
 
 	Datetime::nowUTCInMilliSecs(&ullNowUTCInMilliSecs, &lTimeZoneDifferenceInHours);
 
