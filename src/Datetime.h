@@ -21,8 +21,7 @@
  with the authors.
 */
 
-#ifndef Datetime_h
-#define Datetime_h
+#pragma once
 
 #include <chrono>
 #include <string>
@@ -31,7 +30,7 @@ using namespace std;
 
 class Datetime
 {
-  public:
+public:
 	enum class Format
 	{
 		YYYY_MM_DD_HH_MI_SS = 0,
@@ -39,6 +38,11 @@ class Datetime
 	};
 
   public:
+	static string dateTimeFormat(uint64_t milliSecondsSinceEpoch, const string& outputFormat = "%Y-%m-%dT%H:%M:%SZ",
+		const string& outputPrecision = "seconds");
+	static string dateTimeFormat(tm tm, const string& outputFormat);
+	static string nowLocalTime(const string& outputFormat);
+
 	static string timePointAsLocalString(chrono::system_clock::time_point t);
 	static string timePointAsUtcString(chrono::system_clock::time_point t);
 	static string localToUtcString(tm localTime);
@@ -146,5 +150,3 @@ class Datetime
 	static string utcToUtcString(time_t utc, Format format = Format::YYYY_MM_DD_HH_MI_SS);
 	static string utcToLocalString(time_t utc, Format format = Format::YYYY_MM_DD_HH_MI_SS);
 };
-
-#endif

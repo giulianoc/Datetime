@@ -1,3 +1,5 @@
 
 add_subdirectory(src)
-add_subdirectory(examples/datetime)
+if(DATETIME_EXAMPLES)
+    add_subdirectory(examples/datetime)
+endif()

@@ -149,6 +149,70 @@ void Datetime::nowLocalInMilliSecs(unsigned long long *pullNowLocalInMilliSecs)
 	*pullNowLocalInMilliSecs = ullNowUTCInMilliSecs + (lTimeZoneDifferenceInHours * 3600 * 1000);
 }
 
+string Datetime::dateTimeFormat(uint64_t milliSecondsSinceEpoch, const string& outputFormat, const string& outputPrecision)
+{
+	// https://en.cppreference.com/w/cpp/chrono/system_clock/formatter.html
+	const string &_format = std::format("{{:{}}}", outputFormat);
+
+	// Build time_point from milliseconds
+	const chrono::milliseconds milliSeconds{milliSecondsSinceEpoch};
+	chrono::system_clock::time_point timePointMilliSecs{milliSeconds};
+
+	if (outputPrecision == "millis" || outputPrecision == "milliseconds")
+		return std::vformat(_format, std::make_format_args(timePointMilliSecs));
+	if (outputPrecision == "seconds")
+	{
+		const auto _timePoint = floor<chrono::seconds>(timePointMilliSecs);
+		return std::vformat(_format, std::make_format_args(_timePoint));
+	}
+	if (outputPrecision == "minutes")
+	{
+		const auto _timePoint = floor<chrono::minutes>(timePointMilliSecs);
+		return std::vformat(_format, std::make_format_args(_timePoint));
+	}
+	if (outputPrecision == "hours") {
+		const auto _timePoint = floor<chrono::hours>(timePointMilliSecs);
+		return std::vformat(_format, std::make_format_args(_timePoint));
+	}
+	if (outputPrecision == "days") {
+		const auto _timePoint = floor<chrono::days>(timePointMilliSecs);
+		return std::vformat(_format, std::make_format_args(_timePoint));
+	}
+
+	throw std::runtime_error(std::format("precision '{}' is not supported", outputPrecision));
+}
+
+string Datetime::dateTimeFormat(tm tm, const string& outputFormat)
+{
+
+#ifdef __APPLE__
+	// Apple non ha ancora implementato make_format_args(tm)
+	int year   = tm.tm_year + 1900;
+	int month  = tm.tm_mon + 1;
+	int day    = tm.tm_mday;
+	int hour   = tm.tm_hour;
+	int minute = tm.tm_min;
+	int second = tm.tm_sec;
+
+	return std::vformat(outputFormat,
+	std::make_format_args(year, month, day, hour, minute, second)
+	);
+#else
+	// https://en.cppreference.com/w/cpp/chrono/system_clock/formatter.html
+	const string &_format = std::format("{{:{}}}", outputFormat);
+	return std::vformat(_format,make_format_args(tm));
+#endif
+}
+
+string Datetime::nowLocalTime(const string& outputFormat)
+{
+	tm tmDateTime{};
+	unsigned long ulMilliSecs;
+
+	Datetime::get_tm_LocalTime(&tmDateTime, &ulMilliSecs);
+	return dateTimeFormat(tmDateTime, outputFormat);
+}
+
 string Datetime::nowLocalTime(unsigned long ulTextFormat)
 {
 	tm tmDateTime;

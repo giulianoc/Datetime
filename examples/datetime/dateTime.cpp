@@ -48,6 +48,13 @@ int main()
 	unsigned long ulSeconds;
 	bool bDaylightSavingTime;
 
+	cout << "nowLocalTime: " << Datetime::nowLocalTime(1) << endl;
+#ifdef __APPLE__
+	cout << "nowLocalTime2: " << Datetime::nowLocalTime("{:04}-{:02}-{:02} {:02}:{:02}:{:02}") << endl;
+#else
+	cout << "nowLocalTime2: " << Datetime::nowLocalTime("%Y-%m-%d %H:%M:%S") << endl;
+#endif
+
 	Datetime::nowUTCInMilliSecs(&ullNowUTCInMilliSecs, &lTimeZoneDifferenceInHours);
 
 	cout << "  NowUTCInMilliSecs: " << ullNowUTCInMilliSecs << ", TimeZoneDifferenceInHours: " << lTimeZoneDifferenceInHours << endl;
