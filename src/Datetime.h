@@ -26,8 +26,6 @@
 #include <chrono>
 #include <string>
 
-using namespace std;
-
 class Datetime
 {
 	/*
@@ -39,13 +37,13 @@ public:
 	};
 	*/
   public:
-	static string dateTimeFormat(uint64_t milliSecondsSinceEpoch, const string& outputFormat = "%Y-%m-%dT%H:%M:%SZ",
-		const string& outputPrecision = "seconds");
-	static string dateTimeFormat(const tm &tm, const string& outputFormat = "%Y-%m-%dT%H:%M:%S");
+	static std::string dateTimeFormat(uint64_t milliSecondsSinceEpoch, const std::string& outputFormat = "%Y-%m-%dT%H:%M:%SZ",
+		const std::string& outputPrecision = "seconds");
+	static std::string dateTimeFormat(const tm &tm, const std::string& outputFormat = "%Y-%m-%dT%H:%M:%S");
 
-	static string timePointAsLocalString(chrono::system_clock::time_point t);
-	static string timePointAsUtcString(chrono::system_clock::time_point t);
-	static string localToUtcString(tm localTime);
+	static std::string timePointAsLocalString(std::chrono::system_clock::time_point t);
+	static std::string timePointAsUtcString(std::chrono::system_clock::time_point t);
+	static std::string localToUtcString(tm localTime);
 	static tm utcSecondsToLocalTime(time_t utcTime);
 
 	/**
@@ -62,7 +60,7 @@ public:
 
 	static void nowLocalInMilliSecs(unsigned long long *pullNowLocalInMilliSecs);
 
-	static string nowLocalTime(const string& outputFormat = "%Y-%m-%dT%H:%M:%S", bool milliSeconds = false);
+	static std::string nowLocalTime(const std::string& outputFormat = "%Y-%m-%dT%H:%M:%S", bool milliSeconds = false);
 	/*
 	// ulTextFormat:
 	// 	1: "YYYY-MM-DD HH:MI:SS"
@@ -146,13 +144,13 @@ public:
 
 	static void getLastDayOfMonth(unsigned long ulYear, unsigned long ulMonth, unsigned long *pulLastDayOfMonth);
 
-	static long sTimeToMilliSecs(string sTime);
-	static time_t parseUtcStringToUtcInSecs(const string &datetime);
-	static int64_t parseUtcStringToUtcInMillisecs(const string &datetime);
-	static int64_t sDateMilliSecondsToUtc(string sDate);
-	static string utcToUtcString(time_t utc, const string& outputFormat = "%Y-%m-%dT%H:%M:%SZ",
-		const string& outputPrecision = "seconds");
+	static long sTimeToMilliSecs(std::string sTime);
+	static time_t parseUtcStringToUtcInSecs(const std::string &datetime);
+	static int64_t parseUtcStringToUtcInMillisecs(const std::string &datetime);
+	static int64_t sDateMilliSecondsToUtc(std::string sDate);
+	static std::string utcToUtcString(time_t utc, const std::string& outputFormat = "%Y-%m-%dT%H:%M:%SZ",
+		const std::string& outputPrecision = "seconds");
 	// static string utcToUtcString(time_t utc, Format format = Format::YYYY_MM_DD_HH_MI_SS);
-	static string utcToLocalString(time_t utc, const string& outputFormat = "%Y-%m-%dT%H:%M:%S");
+	static std::string utcToLocalString(time_t utc, const std::string& outputFormat = "%Y-%m-%dT%H:%M:%S");
 	// static string utcToLocalString(time_t utc, Format format = Format::YYYY_MM_DD_HH_MI_SS);
 };

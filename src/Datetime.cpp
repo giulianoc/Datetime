@@ -34,11 +34,11 @@
 #include <format>
 
 // 2021-02-26 15:41:15
-string Datetime::timePointAsLocalString(chrono::system_clock::time_point t)
+std::string Datetime::timePointAsLocalString(std::chrono::system_clock::time_point t)
 {
 	tm tmDateTime;
 	// char strDateTime[64];
-	time_t utcTime = chrono::system_clock::to_time_t(t);
+	time_t utcTime = std::chrono::system_clock::to_time_t(t);
 #ifdef WIN32
 	localtime_s(&tmDateTime, &utcTime);
 #else
@@ -52,11 +52,11 @@ string Datetime::timePointAsLocalString(chrono::system_clock::time_point t)
 }
 
 // 2021-02-26T15:41:15Z
-string Datetime::timePointAsUtcString(chrono::system_clock::time_point t)
+std::string Datetime::timePointAsUtcString(std::chrono::system_clock::time_point t)
 {
 	tm tmDateTime;
 	// char strDateTime[64];
-	time_t utcTime = chrono::system_clock::to_time_t(t);
+	time_t utcTime = std::chrono::system_clock::to_time_t(t);
 #ifdef _WIN32
 	gmtime_s(&tmDateTime, &utcTime);
 #else
@@ -69,7 +69,7 @@ string Datetime::timePointAsUtcString(chrono::system_clock::time_point t)
 	);
 }
 
-string Datetime::localToUtcString(tm localTime)
+std::string Datetime::localToUtcString(tm localTime)
 {
 #ifdef _WIN32
 	time_t utcTime = _mkgmtime(&localTime);
@@ -149,45 +149,45 @@ void Datetime::nowLocalInMilliSecs(unsigned long long *pullNowLocalInMilliSecs)
 	*pullNowLocalInMilliSecs = ullNowUTCInMilliSecs + (lTimeZoneDifferenceInHours * 3600 * 1000);
 }
 
-string Datetime::dateTimeFormat(const uint64_t milliSecondsSinceEpoch, const string& outputFormat, const string& outputPrecision)
+std::string Datetime::dateTimeFormat(const uint64_t milliSecondsSinceEpoch, const std::string& outputFormat, const std::string& outputPrecision)
 {
 	// https://en.cppreference.com/w/cpp/chrono/system_clock/formatter.html
-	const string &_format = std::format("{{:{}}}", outputFormat);
+	const std::string &_format = std::format("{{:{}}}", outputFormat);
 
 	// Build time_point from milliseconds
-	const chrono::milliseconds milliSeconds{milliSecondsSinceEpoch};
-	chrono::system_clock::time_point timePointMilliSecs{milliSeconds};
+	const std::chrono::milliseconds milliSeconds{milliSecondsSinceEpoch};
+	std::chrono::system_clock::time_point timePointMilliSecs{milliSeconds};
 
 	if (outputPrecision == "millis" || outputPrecision == "milliseconds")
 		return std::vformat(_format, std::make_format_args(timePointMilliSecs));
 	if (outputPrecision == "seconds")
 	{
-		const auto _timePoint = floor<chrono::seconds>(timePointMilliSecs);
+		const auto _timePoint = floor<std::chrono::seconds>(timePointMilliSecs);
 		return std::vformat(_format, std::make_format_args(_timePoint));
 	}
 	if (outputPrecision == "minutes")
 	{
-		const auto _timePoint = floor<chrono::minutes>(timePointMilliSecs);
+		const auto _timePoint = floor<std::chrono::minutes>(timePointMilliSecs);
 		return std::vformat(_format, std::make_format_args(_timePoint));
 	}
 	if (outputPrecision == "hours") {
-		const auto _timePoint = floor<chrono::hours>(timePointMilliSecs);
+		const auto _timePoint = floor<std::chrono::hours>(timePointMilliSecs);
 		return std::vformat(_format, std::make_format_args(_timePoint));
 	}
 	if (outputPrecision == "days") {
-		const auto _timePoint = floor<chrono::days>(timePointMilliSecs);
+		const auto _timePoint = floor<std::chrono::days>(timePointMilliSecs);
 		return std::vformat(_format, std::make_format_args(_timePoint));
 	}
 
 	throw std::runtime_error(std::format("precision '{}' is not supported", outputPrecision));
 }
 
-string Datetime::dateTimeFormat(const tm &tm, const string& outputFormat)
+std::string Datetime::dateTimeFormat(const tm &tm, const std::string& outputFormat)
 {
 	char buff[128];
 	// https://en.cppreference.com/w/c/chrono/strftime.html
 	if (!strftime(buff, sizeof buff, outputFormat.c_str(), &tm))
-		throw runtime_error("strftime failed");
+		throw std::runtime_error("strftime failed");
 
 	return {buff};
 
@@ -200,13 +200,13 @@ string Datetime::dateTimeFormat(const tm &tm, const string& outputFormat)
 	*/
 }
 
-string Datetime::nowLocalTime(const string& outputFormat, const bool milliSeconds)
+std::string Datetime::nowLocalTime(const std::string& outputFormat, const bool milliSeconds)
 {
 	tm tmDateTime{};
 	unsigned long ulMilliSecs;
 
 	Datetime::get_tm_LocalTime(&tmDateTime, &ulMilliSecs);
-	string sDateTime = dateTimeFormat(tmDateTime, outputFormat);
+	std::string sDateTime = dateTimeFormat(tmDateTime, outputFormat);
 
 	return milliSeconds ? std::format("{}.{:03}", sDateTime, ulMilliSecs) : sDateTime ;
 }
@@ -258,9 +258,9 @@ void Datetime::getTimeZoneInformation(long *plTimeZoneDifferenceInHours)
 
 	if (::gettimeofday(&tv, &tz) != 0)
 	{
-		string errorMessage = std::format("gettimeofday failed");
+		std::string errorMessage = std::format("gettimeofday failed");
 		// SPDLOG_ERROR(errorMessage);
-		throw runtime_error(errorMessage);
+		throw std::runtime_error(errorMessage);
 	}
 
 	*plTimeZoneDifferenceInHours = ((tz.tz_minuteswest / 60) * (-1));
@@ -294,9 +294,9 @@ void Datetime::get_tm_LocalTime(tm *ptmDateTime, unsigned long *pulMilliSecs)
 
 	if (gettimeofday(&tvTimeval, NULL) == -1)
 	{
-		string errorMessage = std::format("gettimeofday failed");
+		std::string errorMessage = std::format("gettimeofday failed");
 		// SPDLOG_ERROR(errorMessage);
-		throw runtime_error(errorMessage);
+		throw std::runtime_error(errorMessage);
 	}
 
 	Datetime::convertFromUTCToLocal(tvTimeval.tv_sec, ptmDateTime);
@@ -444,13 +444,13 @@ void Datetime::getLastDayOfMonth(unsigned long ulYear, unsigned long ulMonth, un
 
 	if (ulMonth <= 0 || ulMonth > 12)
 	{
-		string errorMessage = std::format(
+		std::string errorMessage = std::format(
 			"Wrong input"
 			", ulMonth: {}",
 			ulMonth
 		);
 		// SPDLOG_ERROR(errorMessage);
-		throw runtime_error(errorMessage);
+		throw std::runtime_error(errorMessage);
 	}
 
 	Datetime::isLeapYear(ulYear, &bIsLeapYear);
@@ -523,14 +523,14 @@ time_t Datetime::sDateSecondsToUtc(string sDate)
 */
 
 // 2021-02-26T15:41:15Z
-time_t Datetime::parseUtcStringToUtcInSecs(const string &datetime)
+time_t Datetime::parseUtcStringToUtcInSecs(const std::string &datetime)
 {
 	// E' importante che la stringa abbia sempre la Z finale (Z = Zulu = UTC)
 	tm tm = {};
-	istringstream ss(datetime);
-	ss >> get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
+	std::istringstream ss(datetime);
+	ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
 	if (ss.fail())
-		throw runtime_error(std::format("Parsing datetime failed. datetime: {}", datetime));
+		throw std::runtime_error(std::format("Parsing datetime failed. datetime: {}", datetime));
 
 	// timegm interpreta la tm come UTC
 #ifdef _WIN32
@@ -541,7 +541,7 @@ time_t Datetime::parseUtcStringToUtcInSecs(const string &datetime)
 }
 
 // 2021-02-26T15:41:15.765Z
-int64_t Datetime::parseUtcStringToUtcInMillisecs(const string &datetime)
+int64_t Datetime::parseUtcStringToUtcInMillisecs(const std::string &datetime)
 {
 	// return Datetime::parseUtcStringToUtcInSecs(datetime) * 1000;
 	std::tm tm = {};
@@ -552,13 +552,13 @@ int64_t Datetime::parseUtcStringToUtcInMillisecs(const string &datetime)
 	char discard;
 	ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%S");
 	if (ss.fail())
-		throw runtime_error(std::format("Parsing datetime failed. datetime: {}", datetime));
+		throw std::runtime_error(std::format("Parsing datetime failed. datetime: {}", datetime));
 	ss >> discard; // '.' prima dei millisecondi
 	if (ss.fail())
-		throw runtime_error(std::format("Parsing datetime failed. datetime: {}", datetime));
+		throw std::runtime_error(std::format("Parsing datetime failed. datetime: {}", datetime));
 	ss >> millis;
 	if (ss.fail())
-		throw runtime_error(std::format("Parsing datetime failed. datetime: {}", datetime));
+		throw std::runtime_error(std::format("Parsing datetime failed. datetime: {}", datetime));
 
 	// timegm interpreta la tm come UTC
 #ifdef _WIN32
@@ -570,7 +570,7 @@ int64_t Datetime::parseUtcStringToUtcInMillisecs(const string &datetime)
 }
 
 // HH:MM
-long Datetime::sTimeToMilliSecs(string sTime)
+long Datetime::sTimeToMilliSecs(std::string sTime)
 {
 	int hours;
 	int minutes;
@@ -582,7 +582,7 @@ long Datetime::sTimeToMilliSecs(string sTime)
 	if ((sscanfReturn = sscanf(sTime.c_str(), "%2d:%2d", &hours, &minutes)) != 2)
 #endif
 	{
-		string errorMessage = std::format(
+		std::string errorMessage = std::format(
 			"Field has a wrong format (sscanf failed)"
 			", sTime: {}"
 			", sscanfReturn: {}",
@@ -595,7 +595,7 @@ long Datetime::sTimeToMilliSecs(string sTime)
 	return (hours * 3600 + minutes * 60) * 1000;
 }
 
-string Datetime::utcToUtcString(const time_t utc, const string& outputFormat, const string& outputPrecision)
+std::string Datetime::utcToUtcString(const time_t utc, const std::string& outputFormat, const std::string& outputPrecision)
 {
 	return dateTimeFormat(utc * 1000, outputFormat, outputPrecision);
 }
@@ -624,7 +624,7 @@ string Datetime::utcToUtcString(time_t utc, Format format)
 }
 */
 
-string Datetime::utcToLocalString(const time_t utc, const string& outputFormat)
+std::string Datetime::utcToLocalString(const time_t utc, const std::string& outputFormat)
 {
 	tm tmDateTime = utcSecondsToLocalTime(utc);
 	return dateTimeFormat(tmDateTime, outputFormat);
@@ -650,7 +650,7 @@ string Datetime::utcToLocalString(time_t utc, Format format)
 
 // 2021-02-26T15:41:15.477+0100 (ISO8610)
 // 2021-02-26T15:41:15.477Z
-int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
+int64_t Datetime::sDateMilliSecondsToUtc(std::string sDate)
 {
 
 	unsigned long ulUTCYear;
@@ -666,7 +666,7 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 	int sscanfReturn;
 
 	char signTimeZone = '+';
-	string dateFormat;
+	std::string dateFormat;
 	if (sDate.size() == 28)
 	{
 		// 2021-02-26T15:41:15.477+0100 (ISO8610)
@@ -685,14 +685,14 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 	}
 	else
 	{
-		string errorMessage = std::format(
+		std::string errorMessage = std::format(
 			"Wrong date format"
 			", sDate: {}",
 			sDate
 		);
 		// SPDLOG_ERROR(errorMessage);
 
-		throw runtime_error(errorMessage);
+		throw std::runtime_error(errorMessage);
 	}
 
 	if (sDate.size() == 28)
@@ -709,7 +709,7 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 			 )) != 9)
 #endif
 		{
-			string errorMessage = std::format(
+			std::string errorMessage = std::format(
 				"Field has a wrong format (sscanf failed)"
 				", sDate: {}"
 				", sscanfReturn: {}",
@@ -717,7 +717,7 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 			);
 			// SPDLOG_ERROR(errorMessage);
 
-			throw runtime_error(errorMessage);
+			throw std::runtime_error(errorMessage);
 		}
 	}
 	else
@@ -732,7 +732,7 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 			 )) != 7)
 #endif
 		{
-			string errorMessage = std::format(
+			std::string errorMessage = std::format(
 				"Field has a wrong format (sscanf failed)"
 				", sDate: {}"
 				", sscanfReturn: {}",
@@ -740,7 +740,7 @@ int64_t Datetime::sDateMilliSecondsToUtc(string sDate)
 			);
 			// SPDLOG_ERROR(errorMessage);
 
-			throw runtime_error(errorMessage);
+			throw std::runtime_error(errorMessage);
 		}
 	}
 
