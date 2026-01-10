@@ -34,7 +34,6 @@ using namespace std;
 int main()
 
 {
-
 	unsigned long long ullNowUTCInMilliSecs;
 	unsigned long long ullUTCInSecs;
 	tm tmDateTime;

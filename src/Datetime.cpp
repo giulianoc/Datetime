@@ -151,31 +151,37 @@ void Datetime::nowLocalInMilliSecs(unsigned long long *pullNowLocalInMilliSecs)
 
 std::string Datetime::dateTimeFormat(const uint64_t milliSecondsSinceEpoch, const std::string& outputFormat, const std::string& outputPrecision)
 {
-	// https://en.cppreference.com/w/cpp/chrono/system_clock/formatter.html
-	const std::string &_format = std::format("{{:{}}}", outputFormat);
-
 	// Build time_point from milliseconds
 	const std::chrono::milliseconds milliSeconds{milliSecondsSinceEpoch};
 	std::chrono::system_clock::time_point timePointMilliSecs{milliSeconds};
 
+	return dateTimeFormat(timePointMilliSecs, outputFormat, outputPrecision);
+}
+
+std::string Datetime::dateTimeFormat(const std::chrono::system_clock::time_point& timePoint, const std::string& outputFormat,
+	const std::string& outputPrecision)
+{
+	// https://en.cppreference.com/w/cpp/chrono/system_clock/formatter.html
+	const std::string &_format = std::format("{{:{}}}", outputFormat);
+
 	if (outputPrecision == "millis" || outputPrecision == "milliseconds")
-		return std::vformat(_format, std::make_format_args(timePointMilliSecs));
+		return std::vformat(_format, std::make_format_args(timePoint));
 	if (outputPrecision == "seconds")
 	{
-		const auto _timePoint = floor<std::chrono::seconds>(timePointMilliSecs);
+		const auto _timePoint = floor<std::chrono::seconds>(timePoint);
 		return std::vformat(_format, std::make_format_args(_timePoint));
 	}
 	if (outputPrecision == "minutes")
 	{
-		const auto _timePoint = floor<std::chrono::minutes>(timePointMilliSecs);
+		const auto _timePoint = floor<std::chrono::minutes>(timePoint);
 		return std::vformat(_format, std::make_format_args(_timePoint));
 	}
 	if (outputPrecision == "hours") {
-		const auto _timePoint = floor<std::chrono::hours>(timePointMilliSecs);
+		const auto _timePoint = floor<std::chrono::hours>(timePoint);
 		return std::vformat(_format, std::make_format_args(_timePoint));
 	}
 	if (outputPrecision == "days") {
-		const auto _timePoint = floor<std::chrono::days>(timePointMilliSecs);
+		const auto _timePoint = floor<std::chrono::days>(timePoint);
 		return std::vformat(_format, std::make_format_args(_timePoint));
 	}
 

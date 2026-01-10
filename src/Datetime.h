@@ -37,7 +37,11 @@ public:
 	};
 	*/
   public:
-	static std::string dateTimeFormat(uint64_t milliSecondsSinceEpoch, const std::string& outputFormat = "%Y-%m-%dT%H:%M:%SZ",
+	static std::string dateTimeFormat(uint64_t milliSecondsSinceEpoch,
+		const std::string& outputFormat = "%Y-%m-%dT%H:%M:%SZ",
+		const std::string& outputPrecision = "seconds");
+	static std::string dateTimeFormat(const std::chrono::system_clock::time_point& timePoint,
+		const std::string& outputFormat = "%Y-%m-%dT%H:%M:%SZ",
 		const std::string& outputPrecision = "seconds");
 	static std::string dateTimeFormat(const tm &tm, const std::string& outputFormat = "%Y-%m-%dT%H:%M:%S");
 
