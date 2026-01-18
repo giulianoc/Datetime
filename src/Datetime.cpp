@@ -80,18 +80,6 @@ std::string Datetime::localToUtcString(tm localTime)
 	return utcToUtcString(utcTime);
 }
 
-tm Datetime::utcSecondsToLocalTime(time_t utcTime)
-{
-	tm tmDateTime;
-
-#ifdef _WIN32
-	localtime_s(&tmDateTime, &utcTime);
-#else
-	localtime_r(&utcTime, &tmDateTime);
-#endif
-	return tmDateTime;
-}
-
 void Datetime::nowUTCInMilliSecs(unsigned long long *pullNowUTCInSecs, unsigned long *pulAdditionalMilliSecs, long *plTimeZoneDifferenceInHours)
 {
 #ifdef _WIN32
@@ -360,6 +348,18 @@ void Datetime::convertFromLocalDateTimeToLocalInSecs(
 	Datetime::getTimeZoneInformation(&lTimeZoneDifferenceInHours);
 
 	*pullLocalInSecs = ((unsigned long long)tUTCTime) + (((unsigned long long)lTimeZoneDifferenceInHours) * 3600);
+}
+
+tm Datetime::utcSecondsToLocalTime(time_t utcTime)
+{
+	tm tmDateTime{};
+
+#ifdef _WIN32
+	localtime_s(&tmDateTime, &utcTime);
+#else
+	localtime_r(&utcTime, &tmDateTime);
+#endif
+	return tmDateTime;
 }
 
 void Datetime::convertFromUTCToLocal(time_t tUTCTime, tm *ptmLocalDateTime)
