@@ -218,7 +218,7 @@ string Datetime::nowLocalTime(unsigned long ulTextFormat)
 			", ulTextFormat: {}",
 			ulTextFormat
 		);
-		// SPDLOG_ERROR(errorMessage);
+		// LOG_ERROR(errorMessage);
 
 		throw runtime_error(errorMessage);
 	}
@@ -253,7 +253,7 @@ void Datetime::getTimeZoneInformation(long *plTimeZoneDifferenceInHours)
 	if (::gettimeofday(&tv, &tz) != 0)
 	{
 		std::string errorMessage = std::format("gettimeofday failed");
-		// SPDLOG_ERROR(errorMessage);
+		// LOG_ERROR(errorMessage);
 		throw std::runtime_error(errorMessage);
 	}
 
@@ -289,7 +289,7 @@ void Datetime::get_tm_LocalTime(tm *ptmDateTime, unsigned long *pulMilliSecs)
 	if (gettimeofday(&tvTimeval, NULL) == -1)
 	{
 		std::string errorMessage = std::format("gettimeofday failed");
-		// SPDLOG_ERROR(errorMessage);
+		// LOG_ERROR(errorMessage);
 		throw std::runtime_error(errorMessage);
 	}
 
@@ -455,7 +455,7 @@ void Datetime::getLastDayOfMonth(unsigned long ulYear, unsigned long ulMonth, un
 			", ulMonth: {}",
 			ulMonth
 		);
-		// SPDLOG_ERROR(errorMessage);
+		// LOG_ERROR(errorMessage);
 		throw std::runtime_error(errorMessage);
 	}
 
@@ -497,7 +497,7 @@ time_t Datetime::sDateSecondsToUtc(string sDate)
 			", sscanfReturn: {}",
 			sDate, sscanfReturn
 		);
-		// SPDLOG_ERROR(errorMessage);
+		// LOG_ERROR(errorMessage);
 
 		throw runtime_error(errorMessage);
 	}
@@ -696,7 +696,7 @@ int64_t Datetime::sDateMilliSecondsToUtc(std::string sDate)
 			", sDate: {}",
 			sDate
 		);
-		// SPDLOG_ERROR(errorMessage);
+		// LOG_ERROR(errorMessage);
 
 		throw std::runtime_error(errorMessage);
 	}
@@ -721,7 +721,7 @@ int64_t Datetime::sDateMilliSecondsToUtc(std::string sDate)
 				", sscanfReturn: {}",
 				sDate, sscanfReturn
 			);
-			// SPDLOG_ERROR(errorMessage);
+			// LOG_ERROR(errorMessage);
 
 			throw std::runtime_error(errorMessage);
 		}
@@ -744,7 +744,7 @@ int64_t Datetime::sDateMilliSecondsToUtc(std::string sDate)
 				", sscanfReturn: {}",
 				sDate, sscanfReturn
 			);
-			// SPDLOG_ERROR(errorMessage);
+			// LOG_ERROR(errorMessage);
 
 			throw std::runtime_error(errorMessage);
 		}
