@@ -93,12 +93,16 @@ std::string Datetime::localStringToUtcString(const std::string& datetime)
 	time_t utcTime = parseStringToUtcInSecs(datetime, "%Y-%m-%dT%H:%M:%S");
 	LOG_INFO("datetime: {}", datetime);
 
-	int offsetSeconds;
+	int offsetSeconds = 0;
 	{
 		char sign;
 		int offsetHours, offsetMinutes;
 		std::istringstream ss(datetime);
 		ss.ignore(23); // skip "2026-01-23T13:28:21.000"
+		std::string aaa;
+		ss >> aaa;
+		LOG_INFO("aaa: {}", aaa);
+		/*
 		ss >> sign
 		   >> std::setw(2) >> offsetHours
 		   >> std::setw(2) >> offsetMinutes;
@@ -108,6 +112,7 @@ std::string Datetime::localStringToUtcString(const std::string& datetime)
 	LOG_INFO("offsetHours: {}", offsetHours);
 	LOG_INFO("offsetMinutes: {}", offsetMinutes);
 	LOG_INFO("offsetSeconds: {}", offsetSeconds);
+	*/
 	}
 
 
