@@ -91,7 +91,7 @@ std::string Datetime::localToUtcString(tm localTime)
 std::string Datetime::localStringToUtcString(const std::string& datetime)
 {
 	time_t utcTime = parseStringToUtcInSecs(datetime, "%Y-%m-%dT%H:%M:%S");
-	LOG_INFO("utcTime in seconds: {}", utcTime);
+	LOG_INFO("datetime: {}", datetime);
 
 	int offsetSeconds;
 	{
@@ -105,9 +105,11 @@ std::string Datetime::localStringToUtcString(const std::string& datetime)
 		offsetSeconds = offsetHours * 3600 + offsetMinutes * 60;
 		if (sign == '-')
 			offsetSeconds = -offsetSeconds;
+	LOG_INFO("offsetHours: {}", offsetHours);
+	LOG_INFO("offsetMinutes: {}", offsetMinutes);
+	LOG_INFO("offsetSeconds: {}", offsetSeconds);
 	}
 
-	LOG_INFO("offsetSeconds: {}", offsetSeconds);
 
 	utcTime -= offsetSeconds;
 
