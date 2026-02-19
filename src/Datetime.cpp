@@ -84,7 +84,7 @@ std::string Datetime::localToUtcString(tm localTime)
 }
 
 
-// convert 2021-02-26T15:41:15.477+0100 (ISO8610) to utc in millisecs
+// convert 2021-02-26T15:41:15.477+0100 (ISO8610) to utc
 uint64_t Datetime::iso8610ToUtc(const std::string& datetime, const bool millisecondsPrecision)
 {
 	if (datetime.size() != 28)
