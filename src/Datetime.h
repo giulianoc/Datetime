@@ -149,12 +149,12 @@ public:
 	static void getLastDayOfMonth(unsigned long ulYear, unsigned long ulMonth, unsigned long *pulLastDayOfMonth);
 
 	static long sTimeToMilliSecs(std::string sTime);
-	static time_t parseUtcStringToUtcInSecs(const std::string &datetime);
+	static time_t parseStringToUtcInSecs(const std::string &datetime, const std::string& inputFormat = "%Y-%m-%dT%H:%M:%SZ");
 	static int64_t parseUtcStringToUtcInMillisecs(const std::string &datetime);
 	static int64_t sDateMilliSecondsToUtc(std::string sDate);
 	static std::string utcToUtcString(time_t utc, const std::string& outputFormat = "%Y-%m-%dT%H:%M:%SZ",
 		const std::string& outputPrecision = "seconds");
-	// static string utcToUtcString(time_t utc, Format format = Format::YYYY_MM_DD_HH_MI_SS);
 	static std::string utcToLocalString(time_t utc, const std::string& outputFormat = "%Y-%m-%dT%H:%M:%S");
-	// static string utcToLocalString(time_t utc, Format format = Format::YYYY_MM_DD_HH_MI_SS);
+
+	static std::string localStringToUtcString(const std::string& datetime);
 };

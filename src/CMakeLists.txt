@@ -28,12 +28,17 @@ SET (HEADERS
 	Datetime.h
 )
 
-#include_directories("${PROJECT_SOURCE_DIR}/../deploy/spdlog/include")
+include_directories("${SPDLOG_INCLUDE_DIR}")
+include_directories("${THREADLOGGER_INCLUDE_DIR}")
 
 add_library (Datetime SHARED ${SOURCES} ${HEADERS})
 
 #target_compile_definitions(Datetime PRIVATE _REENTRANT)
 target_compile_definitions(Datetime PRIVATE _FILE_OFFSET_BITS=64)
+
+if(APPLE)
+	target_link_libraries(Datetime ThreadLogger)
+endif()
 
 if(ZORAC)
 	install (TARGETS Datetime DESTINATION services/cms-import)
