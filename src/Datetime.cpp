@@ -91,8 +91,9 @@ std::string Datetime::localToUtcString(tm localTime)
 std::string Datetime::localStringToUtcString(const std::string& datetime)
 {
 	time_t utcTime = parseStringToUtcInSecs(datetime, "%Y-%m-%dT%H:%M:%S");
+	LOG_INFO("utcTime in seconds: {}", utcTime);
 
-	int offset;
+	int offsetSeconds;
 	{
 		char sign;
 		int offsetHours, offsetMinutes;
@@ -101,15 +102,25 @@ std::string Datetime::localStringToUtcString(const std::string& datetime)
 		ss >> sign
 		   >> std::setw(2) >> offsetHours
 		   >> std::setw(2) >> offsetMinutes;
-		offset = offsetHours * 3600 + offsetMinutes * 60;
+		offsetSeconds = offsetHours * 3600 + offsetMinutes * 60;
 		if (sign == '-')
-			offset = -offset;
+			offsetSeconds = -offsetSeconds;
 	}
 
-	utcTime -= offset;
+	LOG_INFO("offsetSeconds: {}", offsetSeconds);
+
+	utcTime -= offsetSeconds;
 
 	std::tm utcTm{};
 	convertFromUTCInSecondsToBreakDownUTC(utcTime, &utcTm);
+	LOG_INFO("utcTm"
+		"year: {}"
+		", month: {}"
+		", day: {}"
+		", hour: {}"
+		", min: {}"
+		", sec: {}",
+		utcTm.tm_year + 1900, utcTm.tm_mon + 1, utcTm.tm_mday, utcTm.tm_hour, utcTm.tm_min, utcTm.tm_sec);
 
 	return dateTimeFormat(utcTm, "%Y-%m-%dT%H:%M:%S");
 }
