@@ -83,49 +83,37 @@ std::string Datetime::localToUtcString(tm localTime)
 	return utcToUtcString(utcTime);
 }
 
-#include <ctime>
-#include <iomanip>
-#include <sstream>
 
-// from 2026-01-23T13:28:21.000+0100 (local) to 2026-01-23T12:28:21Z (UTC)
-std::string Datetime::localStringToUtcString(const std::string& datetime)
+// convert 2021-02-26T15:41:15.477+0100 (ISO8610) to utc in millisecs
+uint64_t Datetime::iso8610ToUtc(const std::string& datetime, const bool millisecondsPrecision)
 {
-	time_t utcTime = parseStringToUtcInSecs(datetime, "%Y-%m-%dT%H:%M:%S");
-	LOG_INFO("datetime: {}", datetime);
-
-	int offsetSeconds = 0;
+	if (datetime.size() != 28)
 	{
-		char sign;
-		int offsetHours, offsetMinutes;
-		std::istringstream ss(datetime);
-		ss.ignore(23); // skip "2026-01-23T13:28:21.000"
-		ss >> sign
-		   >> std::setw(2) >> offsetHours
-		   >> std::setw(2) >> offsetMinutes;
+		const std::string errorMessage = std::format("Invalid datetime format, expected length is 28, but got {}: {}", datetime.length(), datetime);
+		LOG_ERROR(errorMessage);
+		throw std::runtime_error(errorMessage);
+	}
+
+	int offsetSeconds;
+	{
+		const char sign = datetime[datetime.size() - 5];
+		std::string offsetStr = datetime.substr(datetime.size() - 4, 4);
+		const int offsetHours = std::stoi(offsetStr.substr(0, 2));
+		const int offsetMinutes = std::stoi(offsetStr.substr(2, 2));
 		offsetSeconds = offsetHours * 3600 + offsetMinutes * 60;
 		if (sign == '-')
 			offsetSeconds = -offsetSeconds;
-	LOG_INFO("sign: {}", sign);
-	LOG_INFO("offsetHours: {}", offsetHours);
-	LOG_INFO("offsetMinutes: {}", offsetMinutes);
-	LOG_INFO("offsetSeconds: {}", offsetSeconds);
 	}
 
-
+	time_t utcTime = parseStringToUtcInSecs(datetime, "%Y-%m-%dT%H:%M:%S");
 	utcTime -= offsetSeconds;
 
-	std::tm utcTm{};
-	convertFromUTCInSecondsToBreakDownUTC(utcTime, &utcTm);
-	LOG_INFO("utcTm"
-		"year: {}"
-		", month: {}"
-		", day: {}"
-		", hour: {}"
-		", min: {}"
-		", sec: {}",
-		utcTm.tm_year + 1900, utcTm.tm_mon + 1, utcTm.tm_mday, utcTm.tm_hour, utcTm.tm_min, utcTm.tm_sec);
-
-	return dateTimeFormat(utcTm, "%Y-%m-%dT%H:%M:%S");
+	if (millisecondsPrecision)
+	{
+		const int milliSecs = std::stoi(datetime.substr(datetime.size() - 8, 3));
+		return utcTime * 1000 + milliSecs;
+	}
+	return utcTime;
 }
 
 void Datetime::nowUTCInMilliSecs(unsigned long long *pullNowUTCInSecs, unsigned long *pulAdditionalMilliSecs, long *plTimeZoneDifferenceInHours)

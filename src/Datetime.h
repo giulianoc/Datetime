@@ -156,5 +156,5 @@ public:
 		const std::string& outputPrecision = "seconds");
 	static std::string utcToLocalString(time_t utc, const std::string& outputFormat = "%Y-%m-%dT%H:%M:%S");
 
-	static std::string localStringToUtcString(const std::string& datetime);
+	static uint64_t iso8610ToUtc(const std::string& datetime, const bool millisecondsPrecision = false);
 };
