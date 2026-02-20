@@ -42,7 +42,7 @@ endif()
 add_executable(datetime ${SOURCES} ${HEADERS})
 
 target_link_libraries (datetime Datetime)
-
+target_link_libraries(datetime, ThreadLogger)
 target_link_libraries (datetime crypto)
 if(CRYPTO_FOUND)
 	if (APPLE)
