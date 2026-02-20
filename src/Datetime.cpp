@@ -593,7 +593,7 @@ time_t Datetime::parseStringToUtcInSecs(const std::string &datetime, const std::
 // 2021-02-26T15:41:15.765Z
 int64_t Datetime::parseUtcStringToUtcInMillisecs(const std::string &datetime)
 {
-	// return Datetime::parseUtcStringToUtcInSecs(datetime) * 1000;
+	// return Datetime::parseStringToUtcInSecs(datetime) * 1000;
 	std::tm tm = {};
 	int millis = 0;
 
