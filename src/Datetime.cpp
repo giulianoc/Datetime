@@ -239,44 +239,11 @@ std::string Datetime::nowLocalTime(const std::string& outputFormat, const bool m
 	tm tmDateTime{};
 	unsigned long ulMilliSecs;
 
-	Datetime::get_tm_LocalTime(&tmDateTime, &ulMilliSecs);
+	get_tm_LocalTime(&tmDateTime, &ulMilliSecs);
 	std::string sDateTime = dateTimeFormat(tmDateTime, outputFormat);
 
-	return milliSeconds ? std::format("{}.{:03}", sDateTime, ulMilliSecs) : sDateTime ;
+	return milliSeconds ? std::format("{}{:03}", sDateTime, ulMilliSecs) : sDateTime ;
 }
-
-/*
-string Datetime::nowLocalTime(unsigned long ulTextFormat)
-{
-	tm tmDateTime;
-	unsigned long ulMilliSecs;
-
-	if (ulTextFormat != 1 && ulTextFormat != 2)
-	{
-		string errorMessage = std::format(
-			"Wrong input"
-			", ulTextFormat: {}",
-			ulTextFormat
-		);
-		// LOG_ERROR(errorMessage);
-
-		throw runtime_error(errorMessage);
-	}
-
-	Datetime::get_tm_LocalTime(&tmDateTime, &ulMilliSecs);
-
-	string sDateTime;
-	if (ulTextFormat == 1)
-		sDateTime = std::format(
-			"{:0>4}-{:0>2}-{:0>2} {:0>2}:{:0>2}:{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday, tmDateTime.tm_hour,
-			tmDateTime.tm_min, tmDateTime.tm_sec
-		);
-	else if (ulTextFormat == 2)
-		sDateTime = std::format("{:0>4}_{:0>2}_{:0>2}", tmDateTime.tm_year + 1900, tmDateTime.tm_mon + 1, tmDateTime.tm_mday);
-
-	return sDateTime;
-}
-*/
 
 void Datetime::getTimeZoneInformation(long *plTimeZoneDifferenceInHours)
 {
@@ -287,8 +254,8 @@ void Datetime::getTimeZoneInformation(long *plTimeZoneDifferenceInHours)
 
 	*plTimeZoneDifferenceInHours = ((tzInfo.Bias / 60) * (-1));
 #else
-	struct timeval tv;
-	struct timezone tz;
+	timeval tv{};
+	struct timezone tz{};
 
 	if (::gettimeofday(&tv, &tz) != 0)
 	{
@@ -301,11 +268,11 @@ void Datetime::getTimeZoneInformation(long *plTimeZoneDifferenceInHours)
 #endif
 }
 
-long Datetime::getTimeZoneInformation(void)
+long Datetime::getTimeZoneInformation()
 {
 	long lTimeZoneDifferenceInHours;
 
-	Datetime::getTimeZoneInformation(&lTimeZoneDifferenceInHours);
+	getTimeZoneInformation(&lTimeZoneDifferenceInHours);
 
 	return lTimeZoneDifferenceInHours;
 }
@@ -324,7 +291,7 @@ void Datetime::get_tm_LocalTime(tm *ptmDateTime, unsigned long *pulMilliSecs)
 
 	*pulMilliSecs = stSystemTime.wMilliseconds;
 #else
-	struct timeval tvTimeval;
+	timeval tvTimeval{};
 
 	if (gettimeofday(&tvTimeval, NULL) == -1)
 	{
@@ -333,7 +300,7 @@ void Datetime::get_tm_LocalTime(tm *ptmDateTime, unsigned long *pulMilliSecs)
 		throw std::runtime_error(errorMessage);
 	}
 
-	Datetime::convertFromUTCToLocal(tvTimeval.tv_sec, ptmDateTime);
+	convertFromUTCToLocal(tvTimeval.tv_sec, ptmDateTime);
 
 	*pulMilliSecs = tvTimeval.tv_usec / 1000;
 #endif

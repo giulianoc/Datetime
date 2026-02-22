@@ -47,8 +47,7 @@ int main()
 	unsigned long ulSeconds;
 	bool bDaylightSavingTime;
 
-	// cout << "nowLocalTime: " << Datetime::nowLocalTime(1) << endl;
-	cout << "nowLocalTime: " << Datetime::nowLocalTime("%Y-%m-%d %H:%M:%S") << endl;
+	cout << "nowLocalTime: " << Datetime::nowLocalTime("%Y-%m-%d %H:%M:%S_", true) << endl;
 	// nella futura implementazione di libc potremo usare il formato sotto (vedi implementazione della funzione Datetime::nowLocalTime
 	// cout << "nowLocalTime2: " << Datetime::nowLocalTime("%Y-%m-%d %H:%M:%S") << endl;
 
