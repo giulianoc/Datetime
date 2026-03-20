@@ -47,5 +47,7 @@ if(ZORAC)
 else()
 	install (TARGETS Datetime DESTINATION lib)
 	install (FILES ${HEADERS} DESTINATION include)
+	if(NOT DEFINED DATETIME_INSTALL_HEADERS OR DATETIME_INSTALL_HEADERS)
+		install(FILES ${HEADERS} DESTINATION include)
+	endif()
 endif()
-
