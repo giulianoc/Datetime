@@ -63,7 +63,7 @@ public:
 	static void nowLocalInMilliSecs(unsigned long long *pullNowLocalInMilliSecs);
 
 	static std::string nowLocalTime(const std::string& outputFormat = "%Y-%m-%dT%H:%M:%S",
-		bool milliSeconds = false);
+		bool milliSeconds = false, const std::string& milliSecondsSeparator = "");
 	/*
 	// ulTextFormat:
 	// 	1: "YYYY-MM-DD HH:MI:SS"

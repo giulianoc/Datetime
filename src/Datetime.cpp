@@ -232,7 +232,8 @@ std::string Datetime::dateTimeFormat(const tm &tm, const std::string& outputForm
 	*/
 }
 
-std::string Datetime::nowLocalTime(const std::string& outputFormat, const bool milliSeconds)
+std::string Datetime::nowLocalTime(const std::string& outputFormat, const bool milliSeconds,
+	const std::string& milliSecondsSeparator)
 {
 	tm tmDateTime{};
 	unsigned long ulMilliSecs;
@@ -240,7 +241,7 @@ std::string Datetime::nowLocalTime(const std::string& outputFormat, const bool m
 	get_tm_LocalTime(&tmDateTime, &ulMilliSecs);
 	std::string sDateTime = dateTimeFormat(tmDateTime, outputFormat);
 
-	return milliSeconds ? std::format("{}{:03}", sDateTime, ulMilliSecs) : sDateTime ;
+	return milliSeconds ? std::format("{}{}{:03}", sDateTime, milliSecondsSeparator, ulMilliSecs) : sDateTime ;
 }
 
 void Datetime::getTimeZoneInformation(long *plTimeZoneDifferenceInHours)
