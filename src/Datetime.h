@@ -43,6 +43,12 @@ public:
 		const std::string& outputPrecision = "seconds");
 	static std::string dateTimeFormat(const tm &tm, const std::string& outputFormat = "%Y-%m-%dT%H:%M:%S");
 
+	static time_t parseDateStringToUtcInSecs(const std::string &datetime, const std::string &inputFormat);
+
+	[[deprecated("use parseDateStringToUtcInSecs instead")]]
+	static time_t parseStringToUtcInSecs(const std::string &datetime, const std::string& inputFormat = "%Y-%m-%dT%H:%M:%SZ");
+	static int64_t parseUtcStringToUtcInMillisecs(const std::string &datetime);
+
 	static std::string timePointAsLocalString(std::chrono::system_clock::time_point t);
 	static std::string timePointAsUtcString(std::chrono::system_clock::time_point t);
 	static std::string localToUtcString(tm localTime);
@@ -148,8 +154,7 @@ public:
 	static void getLastDayOfMonth(unsigned long ulYear, unsigned long ulMonth, unsigned long *pulLastDayOfMonth);
 
 	static long sTimeToMilliSecs(std::string sTime);
-	static time_t parseStringToUtcInSecs(const std::string &datetime, const std::string& inputFormat = "%Y-%m-%dT%H:%M:%SZ");
-	static int64_t parseUtcStringToUtcInMillisecs(const std::string &datetime);
+
 	static int64_t sDateMilliSecondsToUtc(std::string sDate);
 	static std::string utcToUtcString(time_t utc, const std::string& outputFormat = "%Y-%m-%dT%H:%M:%SZ",
 		const std::string& outputPrecision = "seconds");

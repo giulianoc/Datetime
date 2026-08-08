@@ -25,7 +25,10 @@
 #include "ThreadLogger.h"
 #include "spdlog/spdlog.h"
 
+#include <cctype>
 #include <iomanip>
+#include <locale>
+#include <sstream>
 #include <stdexcept>
 #ifdef _WIN32
 #include <Windows.h>
@@ -554,6 +557,98 @@ time_t Datetime::parseStringToUtcInSecs(const std::string &datetime, const std::
 #else
 	return timegm(&tm);
 #endif
+}
+
+// std::get_time non supporta %z in modo portabile (fallisce su alcune implementazioni della standard
+// library, viene ignorato silenziosamente su altre lasciando un timegm calcolato come se l'offset non
+// ci fosse, sbagliato esattamente della durata dell'offset).
+// Per questo inputFormat non deve includere %z: il testo che rimane non consumato dopo aver applicato
+// inputFormat viene interpretato qui esplicitamente come UTC offset
+// - vuoto/"Z"/"UTC"/"GMT" per UTC
+// - "+HHMM"/"-HHMM"/"+HH:MM"/"-HH:MM" altrimenti)
+// e applicato manualmente al risultato di timegm.
+// Es. "%a, %d %b %Y %H:%M:%S" per RFC 2822, "%Y-%m-%dT%H:%M:%S" per ISO-8601, ...
+// Es: parseDateStringToUtcInSecs("Thu, 6 Aug 2026 11:04:00 +0200", "%a, %d %b %Y %H:%M:%S")
+time_t Datetime::parseDateStringToUtcInSecs(const std::string &datetime, const std::string &inputFormat)
+{
+	tm tm = {};
+	std::istringstream ss(datetime);
+	ss.imbue(std::locale::classic()); // %a/%b sempre in inglese, indipendentemente dal locale del server
+	// https://en.cppreference.com/cpp/io/manip/get_time
+	ss >> std::get_time(&tm, inputFormat.c_str());
+	if (ss.fail())
+	{
+		const std::string errorMessage = std::format(
+			"parseDateStringToUtcInSecs: parsing failed"
+			", datetime: {}"
+			", inputFormat: {}",
+			datetime, inputFormat
+		);
+		LOG_ERROR(errorMessage);
+		throw std::runtime_error(errorMessage);
+	}
+
+	std::string remaining;
+	std::getline(ss, remaining);
+
+	long offsetInSeconds = 0;
+	{
+		size_t start = remaining.find_first_not_of(" \t");
+		std::string trimmed = start == std::string::npos ? "" : remaining.substr(start);
+
+		if (trimmed.empty() || trimmed == "Z" || trimmed == "z" || trimmed == "UTC" || trimmed == "GMT")
+		{
+			offsetInSeconds = 0;
+		}
+		else if (char sign = trimmed[0]; (sign == '+' || sign == '-') && trimmed.size() >= 5)
+		{
+			std::string digitsOnly;
+			for (size_t i = 1; i < trimmed.size(); i++)
+				if (std::isdigit(static_cast<unsigned char>(trimmed[i])))
+					digitsOnly += trimmed[i];
+
+			if (digitsOnly.size() < 4)
+			{
+				const std::string errorMessage = std::format(
+					"parseDateStringToUtcInSecs: unrecognized UTC offset"
+					", datetime: {}"
+					", inputFormat: {}"
+					", offset: {}",
+					datetime, inputFormat, remaining
+				);
+				LOG_ERROR(errorMessage);
+				throw std::runtime_error(errorMessage);
+			}
+
+			int offsetHours = std::stoi(digitsOnly.substr(0, 2));
+			int offsetMinutes = std::stoi(digitsOnly.substr(2, 2));
+			offsetInSeconds = offsetHours * 3600 + offsetMinutes * 60;
+			if (sign == '-')
+				offsetInSeconds = -offsetInSeconds;
+		}
+		else
+		{
+			const std::string errorMessage = std::format(
+				"parseDateStringToUtcInSecs: unrecognized trailing content after applying inputFormat"
+				", datetime: {}"
+				", inputFormat: {}"
+				", trailingContent: {}",
+				datetime, inputFormat, remaining
+			);
+			LOG_ERROR(errorMessage);
+			throw std::runtime_error(errorMessage);
+		}
+	}
+
+	// timegm interpreta la tm come UTC: essendo invece i campi Y/M/D/H/M/S della "ora locale" indicata
+	// dalla stringa, va sottratto l'offset per ottenere il vero UTC (+0200 => locale = UTC + 2h)
+#ifdef _WIN32
+	time_t localAsUtc = _mkgmtime(&tm);
+#else
+	time_t localAsUtc = timegm(&tm);
+#endif
+
+	return localAsUtc - offsetInSeconds;
 }
 
 // 2021-02-26T15:41:15.765Z
