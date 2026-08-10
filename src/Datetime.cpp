@@ -106,7 +106,7 @@ uint64_t Datetime::iso8610ToUtc(const std::string& datetime, const bool millisec
 			offsetSeconds = -offsetSeconds;
 	}
 
-	time_t utcTime = parseStringToUtcInSecs(datetime, "%Y-%m-%dT%H:%M:%S");
+	time_t utcTime = parseDateStringToUtcInSecs(datetime, "%Y-%m-%dT%H:%M:%S");
 	utcTime -= offsetSeconds;
 
 	if (millisecondsPrecision)
@@ -538,6 +538,7 @@ time_t Datetime::sDateSecondsToUtc(string sDate)
 */
 
 // ex: 2021-02-26T15:41:15Z
+/*
 time_t Datetime::parseStringToUtcInSecs(const std::string &datetime, const std::string& inputFormat)
 {
 	// E' importante che la stringa abbia sempre la Z finale (Z = Zulu = UTC)
@@ -558,6 +559,7 @@ time_t Datetime::parseStringToUtcInSecs(const std::string &datetime, const std::
 	return timegm(&tm);
 #endif
 }
+*/
 
 // std::get_time non supporta %z in modo portabile (fallisce su alcune implementazioni della standard
 // library, viene ignorato silenziosamente su altre lasciando un timegm calcolato come se l'offset non
