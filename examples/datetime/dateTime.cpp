@@ -46,7 +46,10 @@ int main()
 	bool bDaylightSavingTime;
 
 	// cout << "parseStringToUtcInSecs: " << Datetime::parseStringToUtcInSecs("2026-08-10T10:02:40Z", "%Y-%m-%dT%H:%M:%SZ") << endl;
-	cout << "parseDateStringToUtcInSecs: " << Datetime::parseDateStringToUtcInSecs("2026-08-10T10:02:40Z", "%Y-%m-%dT%H:%M:%SZ") << endl;
+	cout << "parseDateStringToUtcInSecs 1: " << Datetime::parseDateStringToUtcInSecs("2026-08-10T10:02:40Z", "%Y-%m-%dT%H:%M:%SZ") << endl;
+	cout << "parseDateStringToUtcInSecs 2: " << Datetime::dateTimeFormat(Datetime::iso8610ToUtc("2019-04-08T13:10:48.000+0100",
+					true)) << endl;
+
 
 	cout << "nowLocalTime: " << Datetime::nowLocalTime("%Y-%m-%d %H:%M:%S_", true) << endl;
 	// nella futura implementazione di libc potremo usare il formato sotto (vedi implementazione della funzione Datetime::nowLocalTime

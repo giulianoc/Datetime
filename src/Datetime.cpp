@@ -106,7 +106,7 @@ uint64_t Datetime::iso8610ToUtc(const std::string& datetime, const bool millisec
 			offsetSeconds = -offsetSeconds;
 	}
 
-	time_t utcTime = parseDateStringToUtcInSecs(datetime, "%Y-%m-%dT%H:%M:%S");
+	time_t utcTime = parseDateStringToUtcInSecs(datetime.substr(0, 19), "%Y-%m-%dT%H:%M:%S");
 	utcTime -= offsetSeconds;
 
 	if (millisecondsPrecision)
